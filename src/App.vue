@@ -1,32 +1,69 @@
 <template>
-  <div id="app">
-    <nav>
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </nav>
-    <router-view/>
+  <div class="page">
+    <div class="page__sidebar">
+      <div class="menu">
+        <router-link to="/" class="menu__item">首页</router-link>
+        <router-link to="/amap" class="menu__item">地图</router-link>
+        <router-link to="/page-designer" class="menu__item">页面装修</router-link>
+      </div>
+    </div>
+    <div class="page__header"></div>
+    <div class="page__main">
+      <router-view />
+    </div>
   </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<script>
+export default {
+  name: 'App',
+};
+</script>
+
+<style lang="scss" scoped>
+.page {
+  width: 100%;
+  height: 100vh;
+  padding-left: 200px;
+  padding-top: 50px;
+  background: #f5f5f5;
+
+  position: relative;
+
+  &__sidebar {
+    width: 200px;
+    height: 100%;
+    padding: 66px 0 16px;
+    background: #ffffff;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  &__header {
+    width: 100%;
+    height: 50px;
+    background: #ffffff;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  &__main {
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+    overflow: auto;
+  }
 }
 
-nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
+.menu {
+  &__item {
+    display: block;
+    padding: 8px 16px;
+    text-decoration: none;
   }
 }
 </style>
