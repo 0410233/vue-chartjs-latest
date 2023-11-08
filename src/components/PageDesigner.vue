@@ -1,7 +1,10 @@
 <template>
   <div class="designer">
     <div class="designer__header"></div>
-    <draggable tag="div" v-model="elements" group:="elements" :animation="250" class="designer__elements">
+    <draggable tag="div" class="designer__elements"
+      v-model="elements"
+      v-bind="elementsDragOptions"
+    >
       <div v-for="element in elements" :key="element.key" class="element">
         <div class="element__icon"></div>
         <div class="element__name">{{ element.name }}</div>
@@ -11,42 +14,91 @@
       <div class="phone">
         <img src="../assets/iphone-frame.png" alt="" class="phone__frame">
         <div class="phone__screen">
-          <div class="phone__content"></div>
+          <div class="phone__layout">
+            <draggable tag="div" class="phone__blocks"
+              v-model="blocks"
+              v-bind="blocksDragOptions" 
+            >
+              <div v-for="block in blocks" :key="block.key"
+                class="block"
+                :class="{'is-active': selectedBlock === block}"
+                @click="selectBlock(block)"
+              >
+                <!-- <div class="block__icon"></div>
+                <div class="block__name">{{ block.name }}</div> -->
+                <component :is="block.key + '-block'" v-bind="block.data"></component>
+              </div>
+            </draggable>
+          </div>
         </div>
       </div>
     </div>
-    <div class="designer__options"></div>
+    <div class="designer__options">
+      <component v-if="selectedBlock" :is="'text-form'" v-bind="selectedBlock.data" @change="onChange"></component>
+    </div>
   </div>
 </template>
 
 <script>
 import draggable from "vuedraggable";
 
-const elements = [{
-  id: 'text',
+const originalElements = [{
+  key: 'text',
   name: '文字',
+  data: {
+    content: '示例文字',
+  },
 }, {
-  id: 'image',
+  key: 'image',
   name: '图片',
+  data: {
+    src: '',
+  },
 }, {
-  id: 'carousel',
+  key: 'carousel',
   name: '轮播',
+  data: {
+    imageList: [],
+  }
 }]
 
 export default {
   name: "PageDesigner",
   components: {
-    draggable
+    draggable,
+    'text-block': () => import('./TextBlock.vue'),
+    'image-block': () => import('./ImageBlock.vue'),
+    'carousel-block': () => import('./CarouselBlock.vue'),
+    'text-form': () => import('./TextForm.vue')
   },
   data() {
     return {
       drag: false,
-      elements: elements.map((el, index) => Object.assign({order: index + 1, fixed: false}, el)),
+      elements: originalElements.map((el, index) => Object.assign({order: index + 1, fixed: false}, el)),
+      blocks: [],
+      selectedBlock: null,
 
-      dragOptions: {
-        animation: 250,
-        group: "elements"
-      }
+      elementsDragOptions: {
+        group: {
+          name: "elements",
+          pull: 'clone',
+          put: false,
+        },
+        ghostClass: 'element--ghost',
+        sort: false,
+        clone: (item) => JSON.parse(JSON.stringify(item)),
+      },
+
+      blocksDragOptions: {
+        animation: 150,
+        group: {
+          name: "elements",
+          pull: false,
+          put: true,
+        },
+        ghostClass: 'block--ghost',
+        sort: true,
+      },
     }
   },
   mounted() {
@@ -56,7 +108,27 @@ export default {
     // 
   },
   methods: {
-    // 
+    selectBlock(block) {
+      this.selectedBlock = block
+    },
+
+    // onClone(evt) {
+    //   console.log('onClone', evt)
+    // },
+
+    // onDrop(evt) {
+    //   console.log('onDrop', evt)
+    //   if (this.blocks[evt.newIndex]) {
+    //     const item = this.blocks[evt.newIndex]
+    //     this.blocks.splice(evt.newIndex, 1, JSON.parse(JSON.stringify(item)))
+    //   }
+    // },
+
+    onChange(data) {
+      if (this.selectedBlock) {
+        Object.assign(this.selectedBlock.data, data)
+      }
+    },
   },
 };
 </script>
@@ -86,7 +158,7 @@ export default {
     flex-wrap: wrap;
     align-content: flex-start;
     flex: none;
-    width: 280px;
+    width: 232px;
     padding: 16px 8px;
     background: #ffffff;
 
@@ -96,6 +168,7 @@ export default {
   &__main {
     flex: none;
     position: relative;
+    margin: 0 40px;
   }
 
   &__options {
@@ -110,12 +183,19 @@ export default {
   flex-direction: column;
   align-items: center;
   flex: none;
-  width: 50%;
+  width: 108px;
   padding: 8px;
+  box-sizing: border-box;
+
+  &--ghost {
+    outline: dashed #5151f2;
+    outline-offset: -2px;
+    opacity: 0.95;
+  }
 
   &__icon {
-    width: 96px;
-    height: 96px;
+    width: 60px;
+    height: 60px;
     border-radius: 4px;
     background: #f1f1f1;
   }
@@ -160,10 +240,61 @@ export default {
     z-index: 10;
   }
 
-  &__content {
+  &__layout {
     width: 100%;
     height: 100%;
+    padding: 4px;
+    box-sizing: border-box;
     overflow: auto;
   }
+
+  &__blocks {
+    width: 100%;
+    min-height: 100%;
+    padding: 8px 0;
+    box-sizing: border-box;
+
+    .block {
+      display: flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 8px 16px;
+
+      &__icon {
+        flex: none;
+        width: 40px;
+        height: 40px;
+        background: #f1f1f1;
+      }
+
+      &__name {
+        font-size: 14px;
+        margin-left: 12px;
+      }
+
+      &.is-active {
+        outline: dashed #666;
+        outline-offset: -2px;
+      }
+
+      &--ghost {
+        outline: dashed #5151f2 !important;
+        outline-offset: -2px;
+        // opacity: 0.6;
+      }
+    }
+
+    .element {
+      width: 100%;
+      padding: 8px 16px;
+
+      &.block--ghost {
+        outline: dashed #5151f2;
+        outline-offset: -2px;
+        opacity: 0.95;
+      }
+    }
+  }
 }
+
 </style>
