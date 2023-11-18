@@ -1,8 +1,9 @@
 <template>
   <div class="amap-wrapper">
+    <DistrictSelect v-model="district"></DistrictSelect>
     <div id="container"></div>
     <div class="amap-search">
-      <input type="text" v-model="search" @change="onSearchChange" placeholder="搜索位置">
+      <input type="text" :value="search" @input="onSearchChange" placeholder="搜索位置">
       <div class="amap-search__results" v-if="result && result.length > 0">
         <div class="amap-search__result" v-for="r in result" :key="r.id">{{ r.name }}</div>
       </div>
@@ -11,9 +12,23 @@
 </template>
 <script>
 import AMapLoader from "@amap/amap-jsapi-loader";
+import DistrictSelect from "./DistrictSelect.vue";
+
+try {
+  if (!window._AMapSecurityConfig) {
+    window._AMapSecurityConfig = {
+      securityJsCode: '6d77de541c407f88fa8c33d9a9184df0',
+    }
+  }
+} catch (error) {
+  console.error(error)
+}
 
 export default {
   name: "vue-amap",
+  components: {
+    DistrictSelect,
+  },
   data() {
     return {
       search: '',
@@ -21,6 +36,8 @@ export default {
       placeSearch: null,
       result: [],
       searchTimer: undefined,
+
+      district: [],
     }
   },
   mounted() {
@@ -32,15 +49,12 @@ export default {
   methods: {
     initAMap() {
       AMapLoader.load({
-        key: "e68d8b91cff6ccb9e6fec4a30ff403be", // 申请好的Web端开发者Key，首次调用 load 时必填
-        version: "2.0", // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
-        plugins: [], // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+        key: "ac1670ac4096582946ab7b1bf00f79f5",
+        version: "2.0",
+        plugins: ['AMap.Scale', 'AMap.PlaceSearch', 'AMap.Marker'],
       }).then((AMap) => {
         const map = new AMap.Map("container", {
-          // 设置地图容器id
-          zoom: 12, // 初始化地图级别
-          center: [120.372537, 36.098056], // 初始化地图中心点位置
-          plugins: ['AMap.Marker']
+          zoom: 14,
         });
 
         map.on('click', (e) => {
@@ -53,19 +67,30 @@ export default {
           // map.setZoomAndCenter(13, e.lnglat, true)
         })
 
-        // 异步同时加载多个插件
-        AMap.plugin(['AMap.Scale', 'AMap.PlaceSearch'], () => {
-          map.addControl(new AMap.Scale());
+        map.addControl(new AMap.Scale());
 
-          this.placeSearch = new AMap.PlaceSearch({
-            pageSize: 10, // 单页显示结果条数
-            pageIndex: 1, // 页码
-            map: map, // 展现结果的地图实例
-            autoFitView: true // 是否自动调整地图视野使绘制的 Marker点都处于视口的可见范围
-          });
+        this.placeSearch = new AMap.PlaceSearch({
+          pageSize: 10, // 单页显示结果条数
+          pageIndex: 1, // 页码
+          map: map, // 展现结果的地图实例
         });
 
+        // const districtSearch = new AMap.DistrictSearch({
+        //   level: 'city', // 关键字对应的行政区级别，country表示国家
+        //   subdistrict: 1 // 显示下级行政区级数，1表示返回下一级行政区
+        // })
+
+        // // 搜索所有省/直辖市信息
+        // districtSearch.search('北京城区', function(status, result) {
+        //   // 查询成功时，result即为对应的行政区信息
+        //   console.log({status, result})
+        // })
+
         this.map = map
+
+        // setTimeout(() => {
+        //   this.district = ['110000', '110100', '110101']
+        // }, 3000);
       }).catch((e) => {
         console.log(e);
       });
@@ -86,11 +111,12 @@ export default {
       this.map.clearMap()
     },
 
-    onSearchChange() {
-      // clearTimeout(this.searchTimer)
+    onSearchChange(e) {
+      this.search = e.detail.value
+      clearTimeout(this.searchTimer)
       if (this.search && this.placeSearch) {
-        // this.searchTimer = setTimeout(() => { this.searchPlace() }, 300)
-        this.searchPlace()
+        this.searchTimer = setTimeout(() => { this.searchPlace() }, 300)
+        // this.searchPlace()
       } else {
         this.clearSearch()
       }

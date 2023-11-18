@@ -20,6 +20,11 @@ const routes = [
     path: '/page-designer',
     name: 'page-designer',
     component: () => import(/* webpackChunkName: "about" */ '../views/PageDesignerView.vue')
+  },
+  {
+    path: '/chart',
+    name: 'chart',
+    component: () => import(/* webpackChunkName: "about" */ '../views/ChartView.vue')
   }
 ]
 
