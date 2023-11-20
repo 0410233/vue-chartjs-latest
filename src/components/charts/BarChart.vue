@@ -8,31 +8,29 @@
 // import Chart from 'chart.js/auto';
 import {
   Chart,
-  LineController,
-  LineElement,
-  PointElement,
+  BarController,
+  BarElement,
   CategoryScale,
   LinearScale,
   Colors,
-  Filler,
   Legend,
   Tooltip,
 } from 'chart.js'
 import { handleDataChange, handleOptionsChange } from './utils'
 
 Chart.register(
-  LineController,
-  LineElement,
-  PointElement,
+  BarController,
+  BarElement,
   CategoryScale,
   LinearScale,
   Colors,
-  Filler,
   Legend,
   Tooltip,
 );
 
 export default {
+  name: 'BarChart',
+  
   props: {
     width: String,
     height: String,
@@ -71,7 +69,7 @@ export default {
   mounted() {
     const ctx = this.$refs.line_chart
     this.chart = new Chart(ctx, {
-      type: 'line',
+      type: 'bar',
       data: this.chartData || {},
       options: this.chartOptions || {},
     });

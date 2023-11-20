@@ -22,9 +22,13 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/PageDesignerView.vue')
   },
   {
-    path: '/chart',
-    name: 'chart',
-    component: () => import(/* webpackChunkName: "about" */ '../views/ChartView.vue')
+    path: '/chart/line',
+    name: 'line-chart',
+    component: () => import(/* webpackChunkName: "chart" */ '../views/LineChartExample.vue')
+  }, {
+    path: '/chart/bar',
+    name: 'bar-chart',
+    component: () => import(/* webpackChunkName: "chart" */ '../views/BarChartExample.vue')
   }
 ]
 

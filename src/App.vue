@@ -5,7 +5,8 @@
         <router-link to="/" class="menu__item">首页</router-link>
         <router-link to="/amap" class="menu__item">地图</router-link>
         <router-link to="/page-designer" class="menu__item">页面装修</router-link>
-        <router-link to="/chart" class="menu__item">图表</router-link>
+        <router-link to="/chart/line" class="menu__item">线形图表</router-link>
+        <router-link to="/chart/bar" class="menu__item">柱形图表</router-link>
       </div>
     </div>
     <div class="page__header"></div>
