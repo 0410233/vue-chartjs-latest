@@ -15,20 +15,23 @@
         <img src="../assets/iphone-frame.png" alt="" class="phone__frame">
         <div class="phone__screen">
           <div class="phone__layout">
-            <draggable tag="div" class="phone__blocks"
-              v-model="blocks"
-              v-bind="blockDragOptions" 
-            >
-              <div v-for="block, index in blocks" :key="block.name"
-                class="block"
-                :class="{'is-active': current === index}"
-                @click="current = index"
+            <el-scrollbar ref="scrollbar">
+              <draggable tag="div"
+                class="phone__blocks"
+                :style="{minHeight: windowHeight + 'px'}"
+                v-model="blocks"
+                v-bind="blockDragOptions"
+                @add="onAdd"
               >
-                <!-- <div class="block__icon"></div>
-                <div class="block__name">{{ block.name }}</div> -->
-                <component :is="block.name" v-bind="block.data"></component>
-              </div>
-            </draggable>
+                <div v-for="block, index in blocks" :key="index"
+                  class="block"
+                  :class="{'is-active': current === index}"
+                  @click="current = index"
+                >
+                  <component :is="block.name" v-bind="block.data"></component>
+                </div>
+              </draggable>
+            </el-scrollbar>
           </div>
         </div>
       </div>
@@ -76,6 +79,7 @@ export default {
     MobileTextForm: () => import('./layout-components/MobileTextForm.vue'),
   },
   data() {
+    // const vm = this;
     return {
       drag: false,
       components: components.map((el, index) => Object.assign({order: index + 1, fixed: false}, el)),
@@ -101,8 +105,10 @@ export default {
           put: true,
         },
         ghostClass: 'block--ghost',
-        sort: true,
+        sort: true
       },
+
+      windowHeight: 300,
     }
   },
   computed: {
@@ -111,28 +117,17 @@ export default {
     },
   },
   mounted() {
-    // 
+    console.log(this.$refs.scrollbar)
+    const rect = this.$refs.scrollbar.$el.getBoundingClientRect()
+    this.windowHeight = Math.max(rect.height - 20, 200)
   },
   unmounted() {
     // 
   },
   methods: {
-    // selectBlock(block) {
-    //   this.current = block
-    // },
-
-    // onClone(evt) {
-    //   console.log('onClone', evt)
-    // },
-
-    // onDrop(evt) {
-    //   console.log('onDrop', evt)
-    //   if (this.blocks[evt.newIndex]) {
-    //     const item = this.blocks[evt.newIndex]
-    //     this.blocks.splice(evt.newIndex, 1, JSON.parse(JSON.stringify(item)))
-    //   }
-    // },
-
+    onAdd(evt) {
+      this.current = evt.newIndex
+    },
     onChange(data) {
       if (this.current >= 0) {
         const value = Object.assign({}, this.blocks[this.current].data, data)
@@ -255,7 +250,16 @@ export default {
     height: 100%;
     padding: 4px;
     box-sizing: border-box;
-    overflow: auto;
+    // overflow: auto;
+        
+    :deep(.el-scrollbar) {
+      width: 100%;
+      height: 100%;
+    }
+
+    :deep(.el-scrollbar__wrap) {
+      overflow-x: visible;
+    }
   }
 
   &__blocks {
@@ -267,7 +271,7 @@ export default {
     .block {
       display: flex;
       align-items: center;
-      min-height: 32px;
+      min-height: 40px;
       padding: 8px 16px;
 
       &__icon {
@@ -306,5 +310,4 @@ export default {
     }
   }
 }
-
 </style>
