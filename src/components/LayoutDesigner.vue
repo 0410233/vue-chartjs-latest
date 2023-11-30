@@ -1,40 +1,44 @@
 <template>
-  <div class="designer">
-    <div class="designer__header"></div>
-    <draggable tag="div" class="designer__elements"
-      v-model="elements"
-      v-bind="elementsDragOptions"
+  <div class="layout">
+    <div class="layout__header"></div>
+    <draggable tag="div" class="layout__components"
+      v-model="components"
+      v-bind="componentDragOptions"
     >
-      <div v-for="element in elements" :key="element.key" class="element">
-        <div class="element__icon"></div>
-        <div class="element__name">{{ element.name }}</div>
+      <div v-for="com in components" :key="com.name" class="component">
+        <div class="component__icon"></div>
+        <div class="component__name">{{ com.label }}</div>
       </div>
     </draggable>
-    <div class="designer__main">
+    <div class="layout__main">
       <div class="phone">
         <img src="../assets/iphone-frame.png" alt="" class="phone__frame">
         <div class="phone__screen">
           <div class="phone__layout">
             <draggable tag="div" class="phone__blocks"
               v-model="blocks"
-              v-bind="blocksDragOptions" 
+              v-bind="blockDragOptions" 
             >
-              <div v-for="block in blocks" :key="block.key"
+              <div v-for="block, index in blocks" :key="block.name"
                 class="block"
-                :class="{'is-active': selectedBlock === block}"
-                @click="selectBlock(block)"
+                :class="{'is-active': current === index}"
+                @click="current = index"
               >
                 <!-- <div class="block__icon"></div>
                 <div class="block__name">{{ block.name }}</div> -->
-                <component :is="block.key + '-block'" v-bind="block.data"></component>
+                <component :is="block.name" v-bind="block.data"></component>
               </div>
             </draggable>
           </div>
         </div>
       </div>
     </div>
-    <div class="designer__options">
-      <component v-if="selectedBlock" :is="'text-form'" v-bind="selectedBlock.data" @change="onChange"></component>
+    <div class="layout__options">
+      <component v-if="currentBlock"
+        :is="currentBlock.name + 'Form'"
+        v-bind="currentBlock.data"
+        @change="onChange"
+      ></component>
     </div>
   </div>
 </template>
@@ -42,57 +46,57 @@
 <script>
 import draggable from "vuedraggable";
 
-const originalElements = [{
-  key: 'text',
-  name: '文字',
+const components = [{
+  name: 'MobileText',
+  label: '文字',
   data: {
     content: '示例文字',
   },
 }, {
-  key: 'image',
-  name: '图片',
+  name: 'MobileImage',
+  label: '图片',
   data: {
     src: '',
   },
 }, {
-  key: 'carousel',
-  name: '轮播',
+  name: 'MobileCarousel',
+  label: '轮播',
   data: {
     imageList: [],
   }
 }]
 
 export default {
-  name: "PageDesigner",
+  name: "LayoutDesigner",
   components: {
     draggable,
-    'text-block': () => import('./TextBlock.vue'),
-    'image-block': () => import('./ImageBlock.vue'),
-    'carousel-block': () => import('./CarouselBlock.vue'),
-    'text-form': () => import('./TextForm.vue')
+    MobileText: () => import('./layout-components/MobileText.vue'),
+    MobileImage: () => import('./layout-components/MobileImage.vue'),
+    MobileCarousel: () => import('./layout-components/MobileCarousel.vue'),
+    MobileTextForm: () => import('./layout-components/MobileTextForm.vue'),
   },
   data() {
     return {
       drag: false,
-      elements: originalElements.map((el, index) => Object.assign({order: index + 1, fixed: false}, el)),
+      components: components.map((el, index) => Object.assign({order: index + 1, fixed: false}, el)),
       blocks: [],
-      selectedBlock: null,
+      current: null,
 
-      elementsDragOptions: {
+      componentDragOptions: {
         group: {
-          name: "elements",
+          name: "layout",
           pull: 'clone',
           put: false,
         },
-        ghostClass: 'element--ghost',
+        ghostClass: 'component--ghost',
         sort: false,
         clone: (item) => JSON.parse(JSON.stringify(item)),
       },
 
-      blocksDragOptions: {
+      blockDragOptions: {
         animation: 150,
         group: {
-          name: "elements",
+          name: "layout",
           pull: false,
           put: true,
         },
@@ -101,6 +105,11 @@ export default {
       },
     }
   },
+  computed: {
+    currentBlock() {
+      return this.blocks[this.current] || null
+    },
+  },
   mounted() {
     // 
   },
@@ -108,9 +117,9 @@ export default {
     // 
   },
   methods: {
-    selectBlock(block) {
-      this.selectedBlock = block
-    },
+    // selectBlock(block) {
+    //   this.current = block
+    // },
 
     // onClone(evt) {
     //   console.log('onClone', evt)
@@ -125,15 +134,16 @@ export default {
     // },
 
     onChange(data) {
-      if (this.selectedBlock) {
-        Object.assign(this.selectedBlock.data, data)
+      if (this.current >= 0) {
+        const value = Object.assign({}, this.blocks[this.current].data, data)
+        this.$set(this.blocks[this.current], 'data', value)
       }
     },
   },
 };
 </script>
 <style lang="scss" scoped>
-.designer {
+.layout {
   display: flex;
   align-items: stretch;
   justify-content: space-between;
@@ -153,7 +163,7 @@ export default {
     left: 0;
   }
 
-  &__elements {
+  &__components {
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
@@ -178,7 +188,7 @@ export default {
   }
 }
 
-.element {
+.component {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -284,7 +294,7 @@ export default {
       }
     }
 
-    .element {
+    .component {
       width: 100%;
       padding: 8px 16px;
 

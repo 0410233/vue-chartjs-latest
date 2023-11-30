@@ -17,9 +17,9 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/AmapView.vue')
   },
   {
-    path: '/page-designer',
-    name: 'page-designer',
-    component: () => import(/* webpackChunkName: "about" */ '../views/PageDesignerView.vue')
+    path: '/layout-designer',
+    name: 'layout-designer',
+    component: () => import(/* webpackChunkName: "about" */ '../views/LayoutDesignerView.vue')
   },
   {
     path: '/chart/line',
