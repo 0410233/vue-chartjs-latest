@@ -1,7 +1,7 @@
 <template>
-  <div class="layout">
-    <div class="layout__header"></div>
-    <draggable tag="div" class="layout__components"
+  <div class="app-page">
+    <div class="app-page__header"></div>
+    <draggable tag="div" class="app-page__components"
       v-model="components"
       v-bind="componentDragOptions"
     >
@@ -10,7 +10,7 @@
         <div class="component__name">{{ com.label }}</div>
       </div>
     </draggable>
-    <div class="layout__main">
+    <div class="app-page__main">
       <div class="phone">
         <img src="../assets/iphone-frame.png" alt="" class="phone__frame">
         <div class="phone__screen">
@@ -36,12 +36,22 @@
         </div>
       </div>
     </div>
-    <div class="layout__options">
-      <component v-if="currentBlock"
-        :is="currentBlock.name + 'Form'"
-        v-bind="currentBlock.data"
-        @change="onChange"
-      ></component>
+    <div class="app-page__options">
+      <el-tabs type="border-card" v-model="currentTab" style="height: 100%;">
+        <el-tab-pane label="布局组件" name="layout">
+          <component v-if="currentBlock"
+            :is="currentBlock.name + 'Form'"
+            v-bind="currentBlock.data"
+            @change="onChange"
+          ></component>
+        </el-tab-pane>
+        <el-tab-pane label="页面标题" name="title">
+          <el-input v-model="title" size="medium" placeholder="标题文字"></el-input>
+        </el-tab-pane>
+        <el-tab-pane label="tabbar" name="tabbar">
+          <span>页面底部 Tabbar</span>
+        </el-tab-pane>
+      </el-tabs>
     </div>
   </div>
 </template>
@@ -50,19 +60,19 @@
 import draggable from "vuedraggable";
 
 const components = [{
-  name: 'MobileText',
+  name: 'AcText',
   label: '文字',
   data: {
     content: '示例文字',
   },
 }, {
-  name: 'MobileImage',
+  name: 'AcImage',
   label: '图片',
   data: {
     src: '',
   },
 }, {
-  name: 'MobileCarousel',
+  name: 'AcCarousel',
   label: '轮播',
   data: {
     imageList: [],
@@ -70,13 +80,13 @@ const components = [{
 }]
 
 export default {
-  name: "LayoutDesigner",
+  name: "AppPageDesigner",
   components: {
     draggable,
-    MobileText: () => import('./layout-components/MobileText.vue'),
-    MobileImage: () => import('./layout-components/MobileImage.vue'),
-    MobileCarousel: () => import('./layout-components/MobileCarousel.vue'),
-    MobileTextForm: () => import('./layout-components/MobileTextForm.vue'),
+    AcText: () => import('./app-page-components/AcText.vue'),
+    AcImage: () => import('./app-page-components/AcImage.vue'),
+    AcCarousel: () => import('./app-page-components/AcCarousel.vue'),
+    AcTextForm: () => import('./app-page-components/AcTextForm.vue'),
   },
   data() {
     // const vm = this;
@@ -85,10 +95,10 @@ export default {
       components: components.map((el, index) => Object.assign({order: index + 1, fixed: false}, el)),
       blocks: [],
       current: null,
-
+      /** 组件拖放选项 */
       componentDragOptions: {
         group: {
-          name: "layout",
+          name: "app-page",
           pull: 'clone',
           put: false,
         },
@@ -96,19 +106,23 @@ export default {
         sort: false,
         clone: (item) => JSON.parse(JSON.stringify(item)),
       },
-
+      /** 布局拖放选项 */
       blockDragOptions: {
         animation: 150,
         group: {
-          name: "layout",
+          name: "app-page",
           pull: false,
           put: true,
         },
         ghostClass: 'block--ghost',
         sort: true
       },
-
-      windowHeight: 300,
+      /** 手机布局高度 */
+      windowHeight: 600,
+      /** 当前选项卡（右侧表单）: layout|title|tabbar */
+      currentTab: 'layout',
+      /** 页面标题 */
+      title: '页面标题',
     }
   },
   computed: {
@@ -117,7 +131,7 @@ export default {
     },
   },
   mounted() {
-    console.log(this.$refs.scrollbar)
+    // console.log(this.$refs.scrollbar)
     const rect = this.$refs.scrollbar.$el.getBoundingClientRect()
     this.windowHeight = Math.max(rect.height - 20, 200)
   },
@@ -138,7 +152,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.layout {
+.app-page {
   display: flex;
   align-items: stretch;
   justify-content: space-between;
@@ -179,7 +193,7 @@ export default {
   &__options {
     flex: none;
     width: 400px;
-    background: #ffffff;
+    // background: #ffffff;
   }
 }
 
@@ -248,16 +262,16 @@ export default {
   &__layout {
     width: 100%;
     height: 100%;
-    padding: 4px;
+    padding: 1px;
     box-sizing: border-box;
     // overflow: auto;
         
-    :deep(.el-scrollbar) {
+    ::v-deep .el-scrollbar {
       width: 100%;
       height: 100%;
     }
 
-    :deep(.el-scrollbar__wrap) {
+    ::v-deep .el-scrollbar__wrap {
       overflow-x: visible;
     }
   }
@@ -287,13 +301,13 @@ export default {
       }
 
       &.is-active {
-        outline: dashed #666;
-        outline-offset: -2px;
+        outline: 2px dashed #666;
+        outline-offset: -4px;
       }
 
       &--ghost {
-        outline: dashed #5151f2 !important;
-        outline-offset: -2px;
+        outline: 2px dashed #5151f2 !important;
+        outline-offset: -4px;
         // opacity: 0.6;
       }
     }
@@ -303,8 +317,8 @@ export default {
       padding: 8px 16px;
 
       &.block--ghost {
-        outline: dashed #5151f2;
-        outline-offset: -2px;
+        outline: 2px dashed #5151f2;
+        outline-offset: -4px;
         opacity: 0.95;
       }
     }

@@ -4,7 +4,7 @@
       <div class="menu">
         <router-link to="/" class="menu__item">首页</router-link>
         <router-link to="/amap" class="menu__item">地图</router-link>
-        <router-link to="/layout-designer" class="menu__item">页面装修</router-link>
+        <router-link to="/app-page-designer" class="menu__item">页面装修</router-link>
         <router-link to="/chart/line" class="menu__item">线形图表</router-link>
         <router-link to="/chart/bar" class="menu__item">柱形图表</router-link>
       </div>
