@@ -77,19 +77,19 @@
 import draggable from "vuedraggable";
 
 const components = [{
-  name: 'AcText',
+  name: 'ApText',
   label: '文字',
   data: {
     content: '示例文字',
   },
 }, {
-  name: 'AcImage',
+  name: 'ApImage',
   label: '图片',
   data: {
     src: '',
   },
 }, {
-  name: 'AcCarousel',
+  name: 'ApCarousel',
   label: '轮播',
   data: {
     imageList: [],
@@ -97,13 +97,13 @@ const components = [{
 }]
 
 export default {
-  name: "AppPageDesigner",
+  name: "AppPageBuilder",
   components: {
     draggable,
-    AcText: () => import('./app-page-components/AcText.vue'),
-    AcImage: () => import('./app-page-components/AcImage.vue'),
-    AcCarousel: () => import('./app-page-components/AcCarousel.vue'),
-    AcTextForm: () => import('./app-page-components/AcTextForm.vue'),
+    ApText: () => import('./app-page-components/ApText.vue'),
+    ApImage: () => import('./app-page-components/ApImage.vue'),
+    ApCarousel: () => import('./app-page-components/ApCarousel.vue'),
+    ApTextForm: () => import('./app-page-components/ApTextForm.vue'),
   },
   data() {
     // const vm = this;

@@ -19,7 +19,7 @@ const routes = [
   {
     path: '/app-page-designer',
     name: 'app-page-designer',
-    component: () => import(/* webpackChunkName: "about" */ '../views/AppPageDesignerView.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/AppPageBuilderView.vue')
   },
   {
     path: '/chart/line',

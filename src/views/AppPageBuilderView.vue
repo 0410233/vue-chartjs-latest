@@ -1,15 +1,15 @@
 <template>
-  <AppPageDesigner></AppPageDesigner>
+  <AppPageBuilder></AppPageBuilder>
   <!-- <HelloWorld></HelloWorld> -->
 </template>
 
 <script>
-import AppPageDesigner from '../components/AppPageDesigner.vue';
+import AppPageBuilder from '../components/AppPageBuilder.vue';
 // import HelloWorld from "../components/HelloWorld";
 
 export default {
-  name: 'AppPageDesignerView',
-  components: {AppPageDesigner},
+  name: 'AppPageBuilderView',
+  components: {AppPageBuilder},
   // components: {HelloWorld},
 }
 </script>
