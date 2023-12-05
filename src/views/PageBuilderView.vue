@@ -1,15 +1,15 @@
 <template>
-  <AppPageBuilder></AppPageBuilder>
+  <PageBuilder></PageBuilder>
   <!-- <HelloWorld></HelloWorld> -->
 </template>
 
 <script>
-import AppPageBuilder from '../components/AppPageBuilder.vue';
+import PageBuilder from '../page-bulder/index.vue';
 // import HelloWorld from "../components/HelloWorld";
 
 export default {
-  name: 'AppPageBuilderView',
-  components: {AppPageBuilder},
+  name: 'PageBuilderView',
+  components: {PageBuilder},
   // components: {HelloWorld},
 }
 </script>

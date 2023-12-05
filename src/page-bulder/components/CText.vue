@@ -1,13 +1,24 @@
 <template>
   <!-- <div class="text">文字组件</div> -->
-  <div class="text">{{ content || '文字组件' }}</div>
+  <div class="text">{{ content }}</div>
 </template>
 
 <script>
 export default {
   props: {
     content: String,
+    fontSize: Number,
+    color: String,
   },
+
+  computed: {
+    style() {
+      return {
+        fontSize: this.fontSize + 'px',
+        color: this.color || '#333333',
+      }
+    }
+  }
 }
 </script>
 
