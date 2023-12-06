@@ -1,139 +1,186 @@
 <template>
-  <div class="page-builder">
-    <div class="page-builder__header"></div>
-    <draggable tag="div" class="page-builder__components"
-      v-model="components"
-      v-bind="componentDragOptions"
-    >
-      <div v-for="com in components" :key="com.name" class="component">
-        <div class="component__icon"></div>
-        <div class="component__name">{{ com.label }}</div>
+  <div class="page-builder-wrapper" :class="isFullscreen && 'is-fullscreen'" ref="el_builder">
+    <div class="page-builder">
+      <div class="page-builder__header">
+        <el-button size="small" type="success" icon="el-icon-view">预览</el-button>
+        <el-button size="small" type="primary" icon="el-icon-document-checked">保存</el-button>
+        <el-button size="small" icon="el-icon-document">草稿</el-button>
+        <el-button v-if="fullscreenEnabled"
+          size="small" icon="el-icon-full-screen"
+          @click="toggleFullscreen"
+        >{{ isFullscreen ? '退出全屏' : '全屏' }}</el-button>
       </div>
-    </draggable>
-    <div class="page-builder__main">
-      <div class="phone">
-        <img src="../assets/iphone-frame.png" alt="" class="phone__frame">
-        <div class="phone__screen">
-          <div class="layer layer--header" :class="currentTab === 'header' ? 'is-active' : ''">
-            <div class="navbar">{{ title }}</div>
-          </div>
-          <div class="layer layer--body" :class="currentTab === 'body' ? 'is-active' : ''">
-            <el-scrollbar ref="scrollbar">
-              <draggable tag="div"
-                class="blocks"
-                :style="{minHeight: windowHeight + 'px'}"
-                v-model="blocks"
-                v-bind="blockDragOptions"
-                @add="onAdd"
-                @end="onBlockDragEnd"
-              >
-                <div v-for="block, index in blocks" :key="index"
-                  class="block"
-                  :class="{'is-active': current === index}"
-                  @click.stop="clickBlock(index)"
+      <draggable tag="div" class="page-builder__components"
+        v-model="components"
+        v-bind="componentDragOptions"
+      >
+        <div v-for="com in components" :key="com.name" class="component">
+          <div class="component__icon"></div>
+          <div class="component__name">{{ com.label }}</div>
+        </div>
+      </draggable>
+      <div class="page-builder__main">
+        <div class="phone">
+          <img src="../assets/iphone-frame.png" alt="" class="phone__frame">
+          <div class="phone__screen" @click="onClickScreen">
+            <div class="layer layer--header" :class="currentTab === 'header' ? 'is-active' : ''">
+              <div class="navbar">{{ headerData.title }}</div>
+            </div>
+            <div class="layer layer--body" :class="currentTab === 'body' ? 'is-active' : ''">
+              <el-scrollbar ref="scrollbar">
+                <draggable tag="div"
+                  class="blocks"
+                  :style="{minHeight: windowHeight + 'px'}"
+                  v-model="blocks"
+                  v-bind="blockDragOptions"
+                  @add="onAdd"
+                  @end="onBlockDragEnd"
                 >
-                  <div class="block__header" @click.stop="noop">
-                    <div class="block__btns">
-                      <div class="block__btn block__btn--close" @click="removeBlock(index)">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="block__btn-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
-                      </div>
-                      <div class="block__btn block__btn--up" @click="moveUpBlock(index)">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="block__btn-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18"></path></svg>
-                      </div>
-                      <div class="block__btn block__btn--down" @click="moveDownBlock(index)">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="block__btn-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3"></path></svg>
-                      </div>
-                      <div class="block__btn block__btn--drag">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 1024 1024" stroke-width="1.5" stroke="currentColor" aria-hidden="true" class="block__btn-icon"><path d="M783.25 413.147l68.9 62.94H548.06V174.629l63.122 66.12 50.87-51.2L509.112 36.572 355.84 189.513l51.2 51.2 68.937-66.084v301.458h-298.35l62.757-62.903-50.834-50.87L36.57 515.253l152.942 152.943 50.834-50.835-62.72-69.12h298.314v301.312l-68.901-65.938-51.2 50.834L509.074 987.43l152.942-152.942-50.834-50.834-63.16 65.901V548.206h304.092l-68.9 69.12 51.2 50.834 153.015-152.869L834.487 362.35z"/></svg>
+                  <div v-for="block, index in blocks" :key="index"
+                    class="block"
+                    :class="{'is-active': current === index}"
+                    @click.stop="clickBlock(index)"
+                  >
+                    <div class="block__header" @click.stop="noop">
+                      <div class="block__btns">
+                        <el-tooltip content="移除" placement="top">
+                          <div class="block__btn block__btn--close" @click="removeBlock(index)">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="block__btn-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
+                            <!-- <i class="el-icon-delete block__btn-icon"></i> -->
+                          </div>
+                        </el-tooltip>
+                        <el-tooltip content="上移" placement="top">
+                          <div class="block__btn block__btn--up" @click="moveUpBlock(index)">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="block__btn-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18"></path></svg>
+                            <!-- <i class="el-icon-top block__btn-icon"></i> -->
+                          </div>
+                        </el-tooltip>
+                        <el-tooltip content="下移" placement="top">
+                          <div class="block__btn block__btn--down" @click="moveDownBlock(index)">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="block__btn-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3"></path></svg>
+                            <!-- <i class="el-icon-bottom block__btn-icon"></i> -->
+                          </div>
+                        </el-tooltip>
+                        <el-tooltip content="拖动排序" placement="top">
+                          <div class="block__btn block__btn--drag">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 1024 1024" stroke="currentColor" class="block__btn-icon"><path d="M783.25 413.147l68.9 62.94H548.06V174.629l63.122 66.12 50.87-51.2L509.112 36.572 355.84 189.513l51.2 51.2 68.937-66.084v301.458h-298.35l62.757-62.903-50.834-50.87L36.57 515.253l152.942 152.943 50.834-50.835-62.72-69.12h298.314v301.312l-68.901-65.938-51.2 50.834L509.074 987.43l152.942-152.942-50.834-50.834-63.16 65.901V548.206h304.092l-68.9 69.12 51.2 50.834 153.015-152.869L834.487 362.35z"/></svg>
+                            <!-- <i class="el-icon-rank block__btn-icon"></i> -->
+                          </div>
+                        </el-tooltip>
                       </div>
                     </div>
+                    <component :is="block.name" v-bind="block.data"></component>
                   </div>
-                  <component :is="block.name" v-bind="block.data"></component>
-                </div>
-              </draggable>
-            </el-scrollbar>
+                </draggable>
+              </el-scrollbar>
+            </div>
+            <div class="layer layer--footer" :class="currentTab === 'footer' ? 'is-active' : ''">
+              <div class="tabbar">{{ '（底部导航）' }}</div>
+            </div>
+            <div :class="{overlay: true, 'is-active': currentTab === 'footer' || currentTab === 'header'}"></div>
           </div>
-          <div class="layer layer--footer" :class="currentTab === 'footer' ? 'is-active' : ''">
-            <div class="tabbar">{{ '（底部导航）' }}</div>
+          <div class="phone__notch">
+            <img src="../assets/iphone-frame.png" alt="" class="phone__frame">
           </div>
-          <div :class="{overlay: true, 'is-active': currentTab === 'footer' || currentTab === 'header'}"></div>
-        </div>
-        <div class="phone__notch">
-          <img src="../assets/iphone-frame.png" alt="" class="phone__frame">
         </div>
       </div>
-    </div>
-    <div class="page-builder__options">
-      <el-tabs type="border-card" v-model="currentTab" style="height: 100%;">
-        <el-tab-pane label="组件" name="body">
+      <div class="page-builder__options options">
+        <!-- <div class="options__tabs">
+          <div class="options__tab"
+            :class="{'is-active': currentTab === 'page'}"
+            @click="currentTab = 'page'"
+          >页面</div>
+          <div class="options__tab"
+            :class="{'is-active': currentTab === 'header'}"
+            @click="currentTab = 'header'"
+          >顶部</div>
+          <div class="options__tab"
+            :class="{'is-active': currentTab === 'body'}"
+            @click="currentTab = 'body'"
+          >内容</div>
+          <div class="options__tab"
+            :class="{'is-active': currentTab === 'footer'}"
+            @click="currentTab = 'footer'"
+          >底部</div>
+        </div>
+        <div v-show="currentTab === 'page'" class="options__panel">
+          <h3>页面设置</h3>
+        </div>
+        <div v-show="currentTab === 'header'" class="options__panel">
+          <h3>顶部导航</h3>
+          <el-form>
+            <el-form-item label="标题：">
+              <el-input v-model="title" size="medium" placeholder="请输入标题"></el-input>
+            </el-form-item>
+          </el-form>
+        </div>
+        <div v-show="currentTab === 'body'" class="options__panel">
           <component v-if="currentBlock"
             :is="currentBlock.name + 'Form'"
             v-bind="currentBlock.data"
             @change="onChange"
           ></component>
-        </el-tab-pane>
-        <el-tab-pane label="标题" name="header">
-          <el-input v-model="title" size="medium" placeholder="标题文字"></el-input>
-        </el-tab-pane>
-        <el-tab-pane label="底部导航" name="footer">
-          <span>（底部导航）</span>
-        </el-tab-pane>
-      </el-tabs>
+        </div>
+        <div v-show="currentTab === 'footer'" class="options__panel">
+          <h3>底部导航</h3>
+        </div> -->
+        <el-tabs type="border-card" v-model="currentTab" style="height: 100%;">
+          <el-tab-pane label="内容" name="body">
+            <component v-if="currentBlock"
+              :is="currentBlock.name + 'Form'"
+              v-bind="currentBlock.data"
+              @change="onChange"
+            ></component>
+          </el-tab-pane>
+          <el-tab-pane label="顶部" name="header">
+            <h3 class="options__title">顶部导航</h3>
+            <p class="options__subtitle"></p>
+            <el-form :model="headerData">
+              <el-form-item label="标题：" prop="title">
+                <el-input v-model="headerData.title" size="medium" placeholder="请输入标题"></el-input>
+              </el-form-item>
+            </el-form>
+          </el-tab-pane>
+          <el-tab-pane label="底部" name="footer">
+            <h3>底部导航</h3>
+          </el-tab-pane>
+          <el-tab-pane label="页面" name="page">
+            <h3>页面设置</h3>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import draggable from "vuedraggable";
-
-const components = [{
-  name: 'CText',
-  label: '文字',
-  data: {
-    content: '示例文字',
-  },
-}, {
-  name: 'CImage',
-  label: '图片',
-  data: {
-    src: '',
-  },
-}, {
-  name: 'CCarousel',
-  label: '轮播',
-  data: {
-    imageList: [],
-  }
-}, {
-  name: 'CGap',
-  label: '间距',
-  data: {
-    height: 12,
-  }
-}]
+import { components } from './config'
 
 export default {
   name: "PageBuilder",
   components: {
     draggable,
+    CTitle: () => import('./components/CTitle.vue'),
+    CTitleForm: () => import('./components/CTitleForm.vue'),
     CText: () => import('./components/CText.vue'),
+    CTextForm: () => import('./components/CTextForm.vue'),
     CImage: () => import('./components/CImage.vue'),
     CCarousel: () => import('./components/CCarousel.vue'),
-    CTextForm: () => import('./components/CTextForm.vue'),
     CGap: () => import('./components/CGap.vue'),
     CGapForm: () => import('./components/CGapForm.vue'),
   },
   data() {
     // const vm = this;
     return {
-      drag: false,
-      components: components.map((el, index) => Object.assign({order: index + 1, fixed: false}, el)),
+      // drag: false,
+      components: components.map((x, i) => Object.assign({order: i + 1, fixed: false}, x)),
       blocks: [],
       current: null,
       /** 组件拖放选项 */
       componentDragOptions: {
         group: {
-          name: "page-builder",
+          name: "page-components",
           pull: 'clone',
           put: false,
         },
@@ -145,7 +192,7 @@ export default {
       blockDragOptions: {
         animation: 150,
         group: {
-          name: "page-builder",
+          name: "page-components",
           pull: false,
           put: true,
         },
@@ -155,10 +202,18 @@ export default {
       },
       /** 手机布局高度 */
       windowHeight: 420,
-      /** 当前选项卡（右侧表单）: body|header|footer */
+      /** 当前选项卡（右侧表单）: page|header|body|footer */
       currentTab: 'body',
-      /** 页面标题 */
-      title: '页面标题',
+
+      headerData: {
+        /** 页面标题 */
+        title: '页面标题',
+      },
+
+      /** 全屏是否可用 */
+      fullscreenEnabled: false,
+      /** 是否全屏 */
+      isFullscreen: false,
     }
   },
   computed: {
@@ -170,11 +225,39 @@ export default {
     // console.log(this.$refs.scrollbar)
     const rect = this.$refs.scrollbar.$el.getBoundingClientRect()
     this.windowHeight = Math.max(rect.height - 20, 420)
+
+    try {
+      if (document && document.fullscreenEnabled) {
+        this.fullscreenEnabled = true
+        // document.onfullscreenchange = () => {
+        //   this.isFullscreen = document.fullscreenElement !== null
+        // }
+        this.$refs.el_builder.onfullscreenchange = () => {
+          this.isFullscreen = document.fullscreenElement !== null
+        }
+      }
+    } catch (err) {
+      console.warn(err)
+    }
   },
   unmounted() {
     // 
   },
   methods: {
+    /** 切换全屏 */
+    toggleFullscreen() {
+      try {
+        // console.log('el_builder', this.$refs.el_builder)
+        if (document.fullscreenElement) {
+          document.exitFullscreen()
+        } else {
+          this.$refs.el_builder.requestFullscreen()
+        }
+      } catch (error) {
+        console.warn(error)
+        this.isFullscreen = false
+      }
+    },
     /** 组件拖放到布局区 */
     onAdd(evt) {
       this.current = evt.newIndex
@@ -231,11 +314,49 @@ export default {
       // }
     },
 
+    onClickScreen() {
+      if (this.currentTab === 'body') {
+        this.current = null
+      }
+    },
+
     noop() {},
   },
 };
 </script>
 <style lang="scss" scoped>
+
+// 模拟器宽度
+$phone-width: 372px;
+// 模拟器高度
+$phone-height: 750px;
+// 模拟器布局宽度
+$phone-screen-width: 328px;
+// 模拟器布局高度
+$phone-screen-height: 712px;
+// 模拟器布局区域圆角大小
+$phone-screen-radius: 40px;
+// 模拟器状态栏高度
+$phone-statusbar-height: 30px;
+// 模拟器导航栏高度
+$phone-navbar-height: 48px;
+// 安全区域高度
+$phone-safearea-height: 34px;
+// 底部导航高度
+$phone-tabbar-height: 50px;
+
+.page-builder-wrapper {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  
+  &.is-fullscreen {
+    // height: 100%;
+    padding: 16px;
+    background: #f5f5f5;
+  }
+}
+
 .page-builder {
   display: flex;
   align-items: stretch;
@@ -244,11 +365,18 @@ export default {
   width: 100%;
   min-height: 100%;
   padding-top: 60px;
+  box-sizing: border-box;
   position: relative;
 
   &__header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
     width: 100%;
     height: 48px;
+    padding: 0 16px;
+    box-sizing: border-box;
     background: #ffffff;
 
     position: absolute;
@@ -311,8 +439,8 @@ export default {
 }
 
 .phone {
-  width: 372px;
-  height: 750px;
+  width: $phone-width;
+  height: $phone-height;
   border-radius: 60px;
   background: #ffffff;
 
@@ -320,8 +448,8 @@ export default {
 
   &__frame {
     display: block;
-    width: 372px;
-    height: 750px;
+    width: $phone-width;
+    height: $phone-height;
 
     position: absolute;
     top: 0;
@@ -346,10 +474,10 @@ export default {
 
   &__screen {
     display: block;
-    width: 328px;
-    height: 712px;
+    width: $phone-screen-width;
+    height: $phone-screen-height;
     /* padding-top: 28px; */
-    border-radius: 40px;
+    border-radius: $phone-screen-radius;
     box-sizing: border-box;
     overflow: hidden;
     background: #ffffff;
@@ -372,8 +500,8 @@ export default {
   }
 
   &--header {
-    height: 74px;
-    padding-top: 30px;
+    height: calc($phone-statusbar-height + $phone-navbar-height);
+    padding-top: $phone-navbar-height;
     background: #ffffff;
 
     top: 0;
@@ -382,15 +510,16 @@ export default {
 
   &--body {
     height: 100%;
-    padding: 74px 0 81px;
+    padding-top: calc($phone-statusbar-height + $phone-navbar-height);
+    padding-bottom: calc($phone-safearea-height + $phone-tabbar-height);
 
     top: 0;
     z-index: 20;
   }
 
   &--footer {
-    height: 84px;
-    padding-bottom: 34px;
+    height: calc($phone-safearea-height + $phone-tabbar-height);
+    padding-bottom: $phone-safearea-height;
     background: #ffffff;
 
     bottom: 0;
