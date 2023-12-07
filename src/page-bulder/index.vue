@@ -38,25 +38,25 @@
                 >
                   <div v-for="block, index in blocks" :key="index"
                     class="block"
-                    :class="{'is-active': current === index}"
+                    :class="{'is-active': selected === index}"
                     @click.stop="clickBlock(index)"
                   >
                     <div class="block__header" @click.stop="noop">
                       <div class="block__btns">
                         <el-tooltip content="移除" placement="top">
-                          <div class="block__btn block__btn--close" @click="removeBlock(index)">
+                          <div class="block__btn block__btn--close" @click="removeBlock">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="block__btn-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
                             <!-- <i class="el-icon-delete block__btn-icon"></i> -->
                           </div>
                         </el-tooltip>
                         <el-tooltip content="上移" placement="top">
-                          <div class="block__btn block__btn--up" @click="moveUpBlock(index)">
+                          <div class="block__btn block__btn--up" @click="moveUpBlock">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="block__btn-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18"></path></svg>
                             <!-- <i class="el-icon-top block__btn-icon"></i> -->
                           </div>
                         </el-tooltip>
                         <el-tooltip content="下移" placement="top">
-                          <div class="block__btn block__btn--down" @click="moveDownBlock(index)">
+                          <div class="block__btn block__btn--down" @click="moveDownBlock">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="block__btn-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3"></path></svg>
                             <!-- <i class="el-icon-bottom block__btn-icon"></i> -->
                           </div>
@@ -115,22 +115,25 @@
           </el-form>
         </div>
         <div v-show="currentTab === 'body'" class="options__panel">
-          <component v-if="currentBlock"
-            :is="currentBlock.name + 'Form'"
-            v-bind="currentBlock.data"
+          <component v-if="selectedBlock"
+            :is="selectedBlock.name + 'Form'"
+            v-bind="selectedBlock.data"
             @change="onChange"
           ></component>
         </div>
         <div v-show="currentTab === 'footer'" class="options__panel">
           <h3>底部导航</h3>
         </div> -->
-        <el-tabs type="border-card" v-model="currentTab" style="height: 100%;">
+        <el-tabs type="border-card" v-model="currentTab" style="height: 100%;"
+          @tab-click="onTabClick"
+        >
           <el-tab-pane label="内容" name="body">
-            <component v-if="currentBlock"
-              :is="currentBlock.name + 'Form'"
-              v-bind="currentBlock.data"
+            <component v-if="selectedBlock"
+              :is="selectedBlock.name + 'Form'"
+              v-bind="selectedBlock.data"
               @change="onChange"
             ></component>
+            <span v-else style="color: #a1a1a1; font-size: 14px;">（选择区块后在这里编辑）</span>
           </el-tab-pane>
           <el-tab-pane label="顶部" name="header">
             <h3 class="options__title">顶部导航</h3>
@@ -175,8 +178,12 @@ export default {
     return {
       // drag: false,
       components: components.map((x, i) => Object.assign({order: i + 1, fixed: false}, x)),
+      /** 区块，组件拖放到布局区后生成区块 */
       blocks: [],
-      current: null,
+      /** 当前选择的区块的序号 */
+      selected: null,
+      /** 切换到非布局区时，保存上一个选择的区块序号 */
+      lastSelect: null,
       /** 组件拖放选项 */
       componentDragOptions: {
         group: {
@@ -188,7 +195,7 @@ export default {
         sort: false,
         clone: (item) => JSON.parse(JSON.stringify(item)),
       },
-      /** 布局拖放选项 */
+      /** 区块拖放选项 */
       blockDragOptions: {
         animation: 150,
         group: {
@@ -202,12 +209,16 @@ export default {
       },
       /** 手机布局高度 */
       windowHeight: 420,
-      /** 当前选项卡（右侧表单）: page|header|body|footer */
+      /** 当前选项卡（右侧表单区）: body|header|footer|page */
       currentTab: 'body',
-
+      /** 页面顶部配置 */
       headerData: {
         /** 页面标题 */
         title: '页面标题',
+      },
+      /** 底部配置 */
+      footer: {
+        tabbarItems: [],
       },
 
       /** 全屏是否可用 */
@@ -217,8 +228,8 @@ export default {
     }
   },
   computed: {
-    currentBlock() {
-      return this.blocks[this.current] || null
+    selectedBlock() {
+      return this.blocks[this.selected] || null
     },
   },
   mounted() {
@@ -226,6 +237,7 @@ export default {
     const rect = this.$refs.scrollbar.$el.getBoundingClientRect()
     this.windowHeight = Math.max(rect.height - 20, 420)
 
+    // 全屏设置
     try {
       if (document && document.fullscreenEnabled) {
         this.fullscreenEnabled = true
@@ -260,66 +272,81 @@ export default {
     },
     /** 组件拖放到布局区 */
     onAdd(evt) {
-      this.current = evt.newIndex
+      this.selected = evt.newIndex
     },
-    /** 布局组件表单变化 */
+    /** 区块参数变化 */
     onChange(data) {
-      if (this.current >= 0) {
-        const value = Object.assign({}, this.blocks[this.current].data, data)
-        this.$set(this.blocks[this.current], 'data', value)
+      if (this.selected >= 0 && this.selectedBlock) {
+        const value = Object.assign({}, this.blocks[this.selected].data, data)
+        this.$set(this.blocks[this.selected], 'data', value)
       }
     },
-    /** 删除布局组件 */
-    removeBlock(index) {
+    /** 删除区块 */
+    removeBlock() {
+      const index = this.selected
       this.blocks.splice(index, 1)
-      if (index === this.current) {
-        if (this.blocks.length < 1) {
-          this.current = null
-        } else {
-          this.current = Math.min(index, this.blocks.length - 1)
-        }
+      if (this.blocks.length < 1) {
+        this.selected = null
+      } else {
+        this.selected = Math.min(index, this.blocks.length - 1)
       }
     },
-    /** 布局组件向上移动 */
-    moveUpBlock(index) {
+    /** 区块上移 */
+    moveUpBlock() {
+      const index = this.selected
       if (index > 0) {
         const block = this.blocks.splice(index, 1)[0]
         this.blocks.splice(index-1, 0, block)
-        if (index === this.current) {
-          this.current = index - 1
-        }
+        this.selected = index - 1
       }
     },
-    /** 布局组件向下移动 */
-    moveDownBlock(index) {
+    /** 区块下移 */
+    moveDownBlock() {
+      const index = this.selected
       if (index < this.blocks.length - 1) {
         const block = this.blocks.splice(index, 1)[0]
         this.blocks.splice(index+1, 0, block)
-        if (index === this.current) {
-          this.current = index + 1
+        this.selected = index + 1
+      }
+    },
+    /** 区块拖动结束 */
+    onBlockDragEnd(evt) {
+      this.selected = evt.newIndex
+    },
+    /** 点击区块 */
+    clickBlock(index) {
+      if (this.currentTab === 'body') {
+        this.selected = index
+      }
+    },
+    /**
+     * 点击模拟器非区块部分，清空当前及保存的区块
+     */
+    onClickScreen() {
+      if (this.currentTab === 'body') {
+        this.selected = null
+      }
+    },
+    /**
+     * 切换表单区 tab 页时，如果选择的不是内容区（布局区），
+     * 则保存当前选择的区块序号并清空选择，并设置内容区不可拖放
+     */
+    onTabClick() {
+      if (this.currentTab === 'body') {
+        this.blockDragOptions.group.put = true
+        if (this.selected === null) {
+          this.selected = this.lastSelect
+        }
+        this.lastSelect = null
+      } else {
+        this.blockDragOptions.group.put = false
+        if (this.selected !== null) {
+          this.lastSelect = this.selected
+          this.selected = null
         }
       }
     },
-    /** 布局组件拖动结束 */
-    onBlockDragEnd(evt) {
-      this.current = evt.newIndex
-    },
-
-    clickBlock(index) {
-      this.current = index
-      // if (index !== this.current) {
-      //   this.current = index
-      // } else {
-      //   this.current = null
-      // }
-    },
-
-    onClickScreen() {
-      if (this.currentTab === 'body') {
-        this.current = null
-      }
-    },
-
+    /** 什么都不做 */
     noop() {},
   },
 };

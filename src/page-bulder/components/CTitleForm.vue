@@ -9,13 +9,42 @@
         <el-input type="textarea" v-model="formdata.desc"></el-input>
       </el-form-item>
     </el-form>
-    <el-form :model="formdata" class="options__form" label-position="left">
-      <el-form-item label="显示位置" class="flex items-center">
+    <el-form :model="formdata" class="options__form" label-position="left" label-width="80px">
+      <el-form-item label="显示位置">
         <div class="flex items-center w-full">
-          <span class="text-gray">{{ alignDisplay[formdata.textAlign] || '' }}</span>
-          <el-radio-group v-model="formdata.textAlign" size="mini" class="ml-auto">
+          <span class="text-gray text-sm">{{ alignDisplay[formdata.textAlign] || '' }}</span>
+          <el-radio-group class="ml-auto" size="mini"
+            v-model="formdata.textAlign"
+            @change="handleChange($event, 'textAlign')"
+          >
             <el-radio-button label="left"><IconAlignLeft/></el-radio-button>
             <el-radio-button label="center"><IconAlignCenter/></el-radio-button>
+          </el-radio-group>
+        </div>
+      </el-form-item>
+      <el-form-item label="标题大小">
+        <div class="flex items-center w-full">
+          <span class="text-gray text-sm">{{ fontSizeDisplay[formdata.titleFontSize] || '' }}</span>
+          <el-radio-group class="ml-auto" size="mini"
+            v-model="formdata.titleFontSize"
+            @change="handleChange($event, 'titleFontSize')"
+          >
+            <el-radio-button :label="16"><span style="font-size: 16px;">A</span></el-radio-button>
+            <el-radio-button :label="14"><span style="font-size: 14px;">A</span></el-radio-button>
+            <el-radio-button :label="12"><span style="font-size: 12px;">A</span></el-radio-button>
+          </el-radio-group>
+        </div>
+      </el-form-item>
+      <el-form-item label="描述大小">
+        <div class="flex items-center w-full">
+          <span class="text-gray text-sm">{{ fontSizeDisplay[formdata.descFontSize] || '' }}</span>
+          <el-radio-group class="ml-auto" size="mini"
+            v-model="formdata.descFontSize"
+            @change="handleChange($event, 'descFontSize')"
+          >
+            <el-radio-button :label="16"><span style="font-size: 16px;">A</span></el-radio-button>
+            <el-radio-button :label="14"><span style="font-size: 14px;">A</span></el-radio-button>
+            <el-radio-button :label="12"><span style="font-size: 12px;">A</span></el-radio-button>
           </el-radio-group>
         </div>
       </el-form-item>
@@ -106,79 +135,18 @@ export default {
     return {
       formdata: generateFormdata(props),
       alignDisplay: {left: '居左显示', center: '居中显示'},
+      fontSizeDisplay: {'16':'大(16号)','14':'小(14号)','12':'小(12号)'}
     }
   },
   watch: generateWatchers(props),
   methods: {
-    onInput(e) {
-      const content = e.target.value
-      this.innerValue = content
-      this.$emit('change', {content})
-    }
+    handleChange(value, prop) {
+      this.$emit('change', {[prop]: value})
+    },
   },
 }
 </script>
 
-<style lang="scss" scoped>
-.options {
-  width: 100%;
-
-  &__title {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0;
-  }
-
-  &__title + &__form {
-    margin-top: 16px;
-  }
-}
-
-.flex {
-  display: flex!important;
-}
-
-.items-center {
-  align-items: center!important;
-}
-
-.flex-1 {
-  flex: 1;
-}
-
-.w-full {
-  width: 100%;
-}
-
-.ml-auto {
-  margin-left: auto!important;
-}
-
-.text-gray {
-  color: #a1a1a1;
-}
-
-.radio-icon {
-  flex: none;
-  width: 16px;
-  height: 16px;
-}
-
-::v-deep .el-form-item.items-center .el-form-item__label {
-  flex: none;
-}
-
-::v-deep .el-form-item.items-center .el-form-item__content {
-  min-width: 0;
-  flex: 1;
-}
-
-::v-deep .el-radio-button.el-radio-button--mini .el-radio-button__inner {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 28px;
-  padding: 0;
-}
+<style lang="scss">
+@import '../assets/style.scss';
 </style>
