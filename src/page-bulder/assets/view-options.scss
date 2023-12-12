@@ -1,5 +1,7 @@
 .options {
   width: 100%;
+  padding: 15px;
+  box-sizing: border-box;
 
   &__title {
     font-size: 18px;
@@ -10,39 +12,16 @@
   &__title + &__form {
     margin-top: 16px;
   }
-
-  // &__item {
-  //   display: flex;
-  //   align-items: center;
-  // }
 }
 
-.flex {
-  display: flex!important;
+.el-tabs__content {
+  height: 100%;
 }
 
-.items-center {
-  align-items: center!important;
-}
-
-.flex-1 {
-  flex: 1;
-}
-
-.w-full {
+.el-tab-pane {
   width: 100%;
-}
-
-.ml-auto {
-  margin-left: auto!important;
-}
-
-.text-sm {
-  font-size: 12px;
-}
-
-.text-gray {
-  color: #a1a1a1;
+  height: 100%;
+  background: #ffffff;
 }
 
 .radio-icon {
@@ -51,18 +30,9 @@
   height: 16px;
 }
 
-// .el-form-item.options__item .el-form-item__label {
-//   flex: none;
-// }
-
 .el-form--label-top .el-form-item__label {
   padding-bottom: 2px;
 }
-
-// .el-form-item.options__item .el-form-item__content {
-//   min-width: 0;
-//   flex: 1;
-// }
 
 .el-radio-button.el-radio-button--mini .el-radio-button__inner {
   display: inline-flex;
@@ -71,4 +41,12 @@
   width: 40px;
   height: 28px;
   padding: 0;
+}
+
+.el-slider__runway.show-input {
+  margin-right: 80px;
+}
+
+.el-slider__input {
+  width: 60px;
 }

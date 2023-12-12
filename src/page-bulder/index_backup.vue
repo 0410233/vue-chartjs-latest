@@ -10,12 +10,13 @@
           @click="toggleFullscreen"
         >{{ isFullscreen ? '退出全屏' : '全屏' }}</el-button>
       </div>
-      <draggable tag="div" class="page-builder__items"
-        v-model="items"
-        v-bind="itemDragOptions"
+      <draggable tag="div" class="page-builder__components"
+        v-model="components"
+        v-bind="componentDragOptions"
       >
-        <div v-for="item in items" :key="item.name" class="component">
-          <component :is="upperFirst(item.name) + 'Item'"></component>
+        <div v-for="com in components" :key="com.name" class="component">
+          <div class="component__icon"></div>
+          <div class="component__name">{{ com.label }}</div>
         </div>
       </draggable>
       <div class="page-builder__layout">
@@ -25,7 +26,7 @@
             <div class="layer layer--header" :class="currentTab === 'header' ? 'is-active' : ''">
               <div class="navbar">{{ headerData.title }}</div>
             </div>
-            <div class="layer layer--body" :class="currentTab === 'view-options' ? 'is-active' : ''">
+            <div class="layer layer--body" :class="currentTab === 'body' ? 'is-active' : ''">
               <el-scrollbar ref="scrollbar">
                 <draggable tag="div"
                   class="views"
@@ -40,6 +41,30 @@
                     :class="{'is-active': selected === index}"
                     @click.stop="onClickView(index)"
                   >
+                    <!-- <div class="view__header" @click.stop="noop">
+                      <div class="view__btns">
+                        <el-tooltip content="移除" placement="top">
+                          <div class="view__btn view__btn--close" @click="removeBlock">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="view__btn-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path></svg>
+                          </div>
+                        </el-tooltip>
+                        <el-tooltip content="上移" placement="top">
+                          <div class="view__btn view__btn--up" @click="moveUpBlock">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="view__btn-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18"></path></svg>
+                          </div>
+                        </el-tooltip>
+                        <el-tooltip content="下移" placement="top">
+                          <div class="view__btn view__btn--down" @click="moveDownBlock">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="view__btn-icon"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3"></path></svg>
+                          </div>
+                        </el-tooltip>
+                        <el-tooltip content="拖动排序" placement="top">
+                          <div class="view__btn view__btn--drag">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 1024 1024" stroke="currentColor" class="view__btn-icon"><path d="M783.25 413.147l68.9 62.94H548.06V174.629l63.122 66.12 50.87-51.2L509.112 36.572 355.84 189.513l51.2 51.2 68.937-66.084v301.458h-298.35l62.757-62.903-50.834-50.87L36.57 515.253l152.942 152.943 50.834-50.835-62.72-69.12h298.314v301.312l-68.901-65.938-51.2 50.834L509.074 987.43l152.942-152.942-50.834-50.834-63.16 65.901V548.206h304.092l-68.9 69.12 51.2 50.834 153.015-152.869L834.487 362.35z"/></svg>
+                          </div>
+                        </el-tooltip>
+                      </div>
+                    </div> -->
                     <component :is="upperFirst(view.name) + 'View'" v-bind="view.data"></component>
                   </div>
                 </draggable>
@@ -56,15 +81,47 @@
         </div>
       </div>
       <div class="page-builder__options" :class="isViewsActive && 'is-views-active'">
+        <!-- <div class="view-sort-open" @click="isViewsActive = true">
+          <svg class="view-sort-toggle-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M1 7.4l.7.7 6-6 6 6 .7-.7L8.1 1h-.7L1 7.4zm0 6l.7.7 6-6 6 6 .7-.7L8.1 7h-.7L1 13.4z" fill="currentColor"/></svg>
+          <span>组件</span>
+        </div> -->
+        <div v-if="false" class="view-sort-container">
+          <div class="view-sort-close" @click="isViewsActive = false">
+            <span>组件列表</span>
+            <svg class="view-sort-toggle-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M1 7.4l.7.7 6-6 6 6 .7-.7L8.1 1h-.7L1 7.4zm0 6l.7.7 6-6 6 6 .7-.7L8.1 7h-.7L1 13.4z" fill="currentColor"/></svg>
+          </div>
+          <div class="view-sort-scroll" ref="view_sort_scroll">
+            <draggable tag="div"
+              class="view-sort-list"
+              v-model="views"
+              v-bind="viewSortDragOptions"
+            >
+              <div v-for="view, index in views" :key="index"
+                class="view-sort-item"
+                :class="{'is-active': selected === index}"
+                @click.stop="onClickSortableView(index)"
+              >
+                <svg class="view-sort-item__drag" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><circle cx="15" cy="12" r="1.5"/><circle cx="15" cy="24" r="1.5"/><circle cx="21" cy="12" r="1.5"/><circle cx="21" cy="24" r="1.5"/><circle cx="21" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/><path fill="none" d="M0 0h36v36H0z"/></svg>
+                <span class="view-sort-item__index">{{ index + 1 }}</span>
+                <span class="view-sort-item__label" :title="view.label">{{ view.label }}</span>
+                <!-- 复制 -->
+                <div class="view-sort-item__btn view-sort-item__btn--copy" title="复制" @click="copyView(index)">
+                  <svg class="view-sort-item__btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0z"/><rect x="4" y="8" width="12" height="12" rx="1" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M8 6V5a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1h-1" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 2" stroke="currentColor"/></svg>
+                </div>
+                <!-- 删除 -->
+                <div class="view-sort-item__btn view-sort-item__btn--delete" title="移除" @click="deleteView(index)">
+                  <svg class="view-sort-item__btn-icon" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><path d="M7 7h18v22H7zM3 7h26M13 3h6M13 12v10M19 12v10" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="currentColor" stroke-width="2px"/></svg>
+                </div>
+              </div>
+            </draggable>
+          </div>
+        </div>
         <el-tabs class="option-tabs"
           tab-position="left"
           v-model="currentTab"
+          @tab-click="onTabClick"
         >
-          <el-tab-pane label="页面设置" name="page">
-            <div class="options">
-              <h4 class="options__title">页面设置</h4>
-            </div>
-          </el-tab-pane>
+          
           <el-tab-pane label="组件管理" name="views-management">
             <div class="view-sort-scroll" ref="view_sort_scroll">
               <draggable tag="div"
@@ -93,9 +150,9 @@
             </div>
           </el-tab-pane>
           <el-tab-pane label="组件设置" name="view-options">
-            <component v-if="selectedView"
-              :is="upperFirst(selectedView.name) + 'Form'"
-              v-bind="selectedView.data"
+            <component v-if="selectedBlock"
+              :is="upperFirst(selectedBlock.name) + 'Form'"
+              v-bind="selectedBlock.data"
               @change="onChange"
             ></component>
             <div v-else class="options">
@@ -118,6 +175,11 @@
               <h4 class="options__title">底部导航</h4>
             </div>
           </el-tab-pane>
+          <el-tab-pane label="页面设置" name="page">
+            <div class="options">
+              <h4 class="options__title">页面设置</h4>
+            </div>
+          </el-tab-pane>
         </el-tabs>
       </div>
     </div>
@@ -126,24 +188,38 @@
 
 <script>
 import draggable from "vuedraggable";
-import { components, metas } from './components'
+import { components } from './config'
 
 export default {
   name: "PageBuilder",
   components: {
     draggable,
-    ...components,
+    CaptionItem: () => import('./components/CaptionItem.vue'),
+    CaptionForm: () => import('./components/CaptionForm.vue'),
+    CaptionView: () => import('./components/CaptionView.vue'),
+    // TextItem: () => import('./components/TextItem.vue'),
+    // TextForm: () => import('./components/TextForm.vue'),
+    // TextView: () => import('./components/TextView.vue'),
+    // CText: () => import('./components/CText.vue'),
+    // CTextForm: () => import('./components/CTextForm.vue'),
+    // CImage: () => import('./components/CImage.vue'),
+    // CCarousel: () => import('./components/CCarousel.vue'),
+    // CGap: () => import('./components/CGap.vue'),
+    // CGapForm: () => import('./components/CGapForm.vue'),
   },
   data() {
+    // const vm = this;
     return {
-      /** 左侧列表项目 */
-      items: metas.map((meta, i) => Object.assign({order: i + 1, fixed: false}, meta)),
+      // drag: false,
+      components: components.map((x, i) => Object.assign({order: i + 1, fixed: false}, x)),
       /** 视图，组件拖放到布局区后生成视图 */
       views: [],
       /** 当前选择的视图的序号 */
       selected: null,
+      /** 切换到非布局区时，保存上一个选择的视图序号 */
+      lastSelect: null,
       /** 组件拖放选项 */
-      itemDragOptions: {
+      componentDragOptions: {
         group: {
           name: "page-components",
           pull: 'clone',
@@ -177,8 +253,8 @@ export default {
       },
       /** 手机布局高度 */
       windowHeight: 420,
-      /** 当前选项卡（右侧表单区）: views-management|view-options|header|footer|page */
-      currentTab: 'view-options',
+      /** 当前选项卡（右侧表单区）: views-management|views-options|header|footer|page */
+      currentTab: 'views-options',
       /** 页面顶部配置 */
       headerData: {
         /** 页面标题 */
@@ -198,7 +274,7 @@ export default {
     }
   },
   computed: {
-    selectedView() {
+    selectedBlock() {
       return this.views[this.selected] || null
     },
   },
@@ -249,9 +325,8 @@ export default {
     },
     /** 视图参数变化 */
     onChange(data) {
-      if (this.selected >= 0 && this.selectedView) {
+      if (this.selected >= 0 && this.selectedBlock) {
         const value = Object.assign({}, this.views[this.selected].data, data)
-        console.log('onChange', {selected: this.selected, value})
         this.$set(this.views[this.selected], 'data', value)
       }
     },
@@ -289,20 +364,43 @@ export default {
     },
     /** 点击视图 */
     onClickView(index) {
-      this.selected = index
-      this.$refs.view_sort_scroll.scrollTo({
-        top: index*36,
-        behavior: "smooth",
-      })
+      if (this.currentTab === 'body') {
+        this.selected = index
+        this.$refs.view_sort_scroll.scrollTo({
+          top: index*36,
+          behavior: "smooth",
+        })
+      }
     },
     /**
      * 点击模拟器非视图部分，清空当前及保存的视图
      */
     onClickScreen() {
-      // if (this.currentTab === 'body') {
-      //   this.selected = null
-      // }
+      if (this.currentTab === 'body') {
+        this.selected = null
+      }
     },
+    /**
+     * 切换表单区 tab 页时，如果选择的不是内容区（布局区），
+     * 则保存当前选择的视图序号并清空选择，并设置内容区不可拖放
+     */
+    onTabClick() {
+      if (this.currentTab === 'body') {
+        this.viewDragOptions.group.put = true
+        if (this.selected === null) {
+          this.selected = this.lastSelect
+        }
+        this.lastSelect = null
+      } else {
+        this.viewDragOptions.group.put = false
+        if (this.selected !== null) {
+          this.lastSelect = this.selected
+          this.selected = null
+        }
+      }
+    },
+    /** 什么都不做 */
+    noop() {},
     /** 第一个字母转大写 */
     upperFirst(str) {
       if (str.length) {
@@ -323,10 +421,10 @@ export default {
     },
     /** 点击排序视图 */
     onClickSortableView(index) {
-      this.selected = index
+      if (this.currentTab === 'body') {
+        this.selected = index
+      }
     },
-    /** 什么都不做 */
-    noop() {},
   },
 };
 </script>
@@ -394,7 +492,7 @@ $phone-tabbar-height: 50px;
     z-index: 10;
   }
 
-  &__items {
+  &__components {
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
@@ -411,6 +509,17 @@ $phone-tabbar-height: 50px;
     position: relative;
     margin: 0 40px;
   }
+  
+  // &__options {
+  //   flex: none;
+  //   width: 360px;
+  //   transition: width 250ms;
+  //   position: relative;
+
+  //   &.is-views-active {
+  //     width: 528px;
+  //   }
+  // }
   
   &__options {
     flex: none;
@@ -698,11 +807,149 @@ $phone-tabbar-height: 50px;
   }
 }
 
+// .options {
+//   flex: none;
+//   width: 360px;
+//   transition: width 250ms;
+//   position: relative;
+
+//   &.is-views-active {
+//     width: 528px;
+//   }
+
+//   &__view-list-toggle {
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     width: 108px;
+//     height: 36px;
+//     padding: 0 6px;
+//     border-radius: 8px;
+//     border: 1px solid #e0e0e0;
+//     box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+//     box-sizing: border-box;
+//     background: #ffffff;
+//     font-size: 14px;
+//     cursor: pointer;
+
+//     position: absolute;
+//     right: 366px;
+//     top: 40px;
+//     z-index: 5;
+//   }
+
+//   &__view-list-container {
+//     width: 168px;
+//     height: 100%;
+//     border: 1px solid #e0e0e0;
+//     border-right: none;
+//     box-sizing: border-box;
+//     background: #ffffff;
+//     overflow-y: auto;
+
+//     position: absolute;
+//     top: 0;
+//     left: 0;
+//     z-index: 10;
+//   }
+
+//   &__tabs {
+//     width: 360px;
+//     height: 100%;
+//     position: absolute;
+//     top: 0;
+//     right: 0;
+//     z-index: 20;
+//   }
+// }
+
+// .view-sort-toggle-icon {
+//   flex: none;
+//   width: 14px;
+//   height: 14px;
+//   color: currentColor;
+// }
+
+// .view-sort-open, .view-sort-close {
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   padding: 0 12px;
+//   box-sizing: border-box;
+  
+//   font-size: 13px;
+//   cursor: pointer;
+//   color: #333333;
+//   background: #ffffff;
+
+//   transition: all 250ms;
+
+//   &:hover {
+//     // color: #ffffff;
+//     // background-color: #409EFF;
+//     background-color: #f1f1f1;
+//   }
+// }
+
+// .view-sort-open {
+//   // width: 96px;
+//   height: 32px;
+//   border-radius: 4px;
+//   border: 1px solid #e0e0e0;
+//   box-shadow: 0 0 6px rgba(0, 0, 0, 0.1);
+
+//   position: absolute;
+//   right: 366px;
+//   top: 40px;
+//   z-index: 5;
+
+//   .view-sort-toggle-icon {
+//     transform: rotate(-90deg);
+//   }
+
+//   span {
+//     white-space: nowrap;
+//     margin-left: 4px;
+//   }
+// }
+
+// .view-sort-close {
+//   width: 100%;
+//   height: 36px;
+//   border-bottom: 1px solid #e0e0e0;
+
+//   position: absolute;
+//   top: 0;
+//   left: 0;
+  
+//   .view-sort-toggle-icon {
+//     transform: rotate(90deg);
+//     margin-left: auto;
+//   }
+  
+//   span {
+//     white-space: nowrap;
+//   }
+// }
+
+.view-sort-container {
+  width: 168px;
+  height: 100%;
+  padding-top: 36px;
+  border: 1px solid #e0e0e0;
+  border-right: none;
+  box-sizing: border-box;
+  background: #ffffff;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
 .view-sort-scroll {
   width: 100%;
   height: 100%;
-  padding: 15px;
-  box-sizing: border-box;
   overflow: hidden;
   overflow-y: auto;
 }
@@ -710,18 +957,13 @@ $phone-tabbar-height: 50px;
 .view-sort-item {
   display: flex;
   align-items: center;
-
   width: 100%;
   height: 36px;
-  padding: 0 6px;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  box-sizing: border-box;
+  padding: 0 6px 0 0;
+  border-bottom: 1px solid #e0e0e0;
 
   font-size: 13px;
   cursor: move;
-
-  margin-bottom: 4px;
 
   &:hover {
     background-color: #f7f7f7;
@@ -776,6 +1018,16 @@ $phone-tabbar-height: 50px;
     opacity: 1;
   }
 }
+
+// .option-tabs {
+//   width: 360px;
+//   height: 100%;
+
+//   position: absolute;
+//   top: 0;
+//   right: 0;
+//   z-index: 20;
+// }
 
 .option-tabs {
   width: 100%;
