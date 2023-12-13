@@ -4,7 +4,7 @@
 </template>
 
 <script>
-import PageBuilder from '../page-bulder/index.vue';
+import PageBuilder from '../page-builder';
 // import HelloWorld from "../components/HelloWorld";
 
 export default {
