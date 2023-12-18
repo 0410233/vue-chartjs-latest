@@ -1,4 +1,6 @@
+import { generateFormdata, generateWatchers } from './utils'
 
+/** 组件属性 */
 export function getProps() {
   return {
     // 标题内容
@@ -24,12 +26,12 @@ export function getProps() {
     // 标题大小 = {12:小,14:中,16:大}
     captionFontSize: {
       type: Number,
-      default: 16,
+      default: 14,
     },
     // 描述大小 = {12:小,14:中,16:大}
     descriptionFontSize: {
       type: Number,
-      default: 12,
+      default: 14,
     },
     // 标题字重 = {400:常规,600:加粗}
     captionFontWeight: {
@@ -56,5 +58,36 @@ export function getProps() {
       type: String,
       default: '#ffffff',
     },
+  }
+}
+
+/** 表单数据 */
+export function getFormdata() {
+  const formdata = generateFormdata(getProps())
+  return formdata
+}
+
+/** 监听器 */
+export function getWatchers(context) {
+  const watchers = generateWatchers(getProps())
+  return watchers
+}
+
+/** 元数据 */
+export function getMeta() {
+  return {
+    name: 'caption',
+    label: '标题文本',
+    cate: 'basic',
+    // count: 0,
+    limit: 100,
+    data: getFormdata(),
+  }
+}
+
+/** 验证规则 */
+export function getRules(context) {
+  return {
+    //
   }
 }

@@ -3,30 +3,30 @@ import { generateFormdata, generateWatchers } from './utils'
 /** 组件属性 */
 export function getProps() {
   return {
-    // 分割类型 = {space:空白,line:分割线}
-    separatorType: {
+    // 商品分类
+    cateList: {
+      type: Array,
+      default: () => [],
+    },
+    // 布局方式 = {aside:左侧,top:顶部}
+    layout: {
       type: String,
-      default: 'space',
+      default: 'aside',
     },
-    // 高度 = [1,100]
-    separatorHeight: {
-      type: Number,
-      default: 30,
+    // 是否显示名称
+    isShowName: {
+      type: Boolean,
+      default: true,
     },
-    // 分割线类型 = {solid:实线,dashed:虚线,dotted:点线}
-    lineStyle: {
-      type: String,
-      default: 'solid',
+    // 是否显示描述
+    isShowDesc: {
+      type: Boolean,
+      default: true,
     },
-    // 左右留边 = {0:无边距,1:左右留边}
-    marginX: {
-      type: Number,
-      default: 0,
-    },
-    // 辅助线颜色
-    lineColor: {
-      type: String,
-      default: '#e5e5e5',
+    // 是否显示价格
+    isShowPrice: {
+      type: Boolean,
+      default: true,
     },
   }
 }
@@ -46,8 +46,8 @@ export function getWatchers(context) {
 /** 元数据 */
 export function getMeta() {
   return {
-    name: 'separator',
-    label: '辅助分割',
+    name: 'goods-category',
+    label: '商品分类',
     cate: 'basic',
     // count: 0,
     limit: 100,

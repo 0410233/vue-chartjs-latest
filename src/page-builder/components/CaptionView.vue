@@ -1,5 +1,4 @@
 <template>
-  <!-- <div class="text">文字组件</div> -->
   <div class="caption-view" :style="{backgroundColor: backgroundColor || '#fff'}">
     <div v-if="caption" class="caption-view__caption" :style="captionStyle">{{ caption }}</div>
     <div v-if="description" class="caption-view__description" :style="descriptionStyle">{{ description }}</div>

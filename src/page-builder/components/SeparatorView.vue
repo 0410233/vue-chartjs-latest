@@ -1,5 +1,4 @@
 <template>
-  <!-- <div class="text">文字组件</div> -->
   <div class="separator-view" :style="separatorStyle">
     <div v-if="separatorType === 'line'" class="separator-view__line" :style="borderStyle"></div>
   </div>
@@ -43,4 +42,3 @@ export default {
   }
 }
 </style>
-./separator

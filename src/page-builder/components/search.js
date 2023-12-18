@@ -3,30 +3,40 @@ import { generateFormdata, generateWatchers } from './utils'
 /** 组件属性 */
 export function getProps() {
   return {
-    // 分割类型 = {space:空白,line:分割线}
-    separatorType: {
-      type: String,
-      default: 'space',
+    /** 是否固定到顶部 */
+    fixed: {
+      type: Boolean,
+      default: false,
     },
-    // 高度 = [1,100]
-    separatorHeight: {
+    /** 圆角大小 */
+    borderRadius: {
       type: Number,
-      default: 30,
+      default: 99,
     },
-    // 分割线类型 = {solid:实线,dashed:虚线,dotted:点线}
-    lineStyle: {
+    /** 显示位置 = {left:居左,center:居中} */
+    textAlign: {
       type: String,
-      default: 'solid',
+      default: 'left',
     },
-    // 左右留边 = {0:无边距,1:左右留边}
-    marginX: {
+    /** 搜索框高度 = [24,48] */
+    barHeight: {
       type: Number,
-      default: 0,
+      default: 36,
     },
-    // 辅助线颜色
-    lineColor: {
+    /** 外框颜色 */
+    outerColor: {
       type: String,
-      default: '#e5e5e5',
+      default: '#efeff5'
+    },
+    /** 文本颜色 */
+    textColor: {
+      type: String,
+      default: '#858585'
+    },
+    /** 背景色 */
+    backgroundColor: {
+      type: String,
+      default: '#ffffff',
     },
   }
 }
@@ -46,11 +56,12 @@ export function getWatchers(context) {
 /** 元数据 */
 export function getMeta() {
   return {
-    name: 'separator',
-    label: '辅助分割',
+    name: 'search',
+    label: '搜索商品',
     cate: 'basic',
     // count: 0,
-    limit: 100,
+    limit: 3,
+    fixed: true,
     data: getFormdata(),
   }
 }

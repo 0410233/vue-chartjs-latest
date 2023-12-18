@@ -7,6 +7,10 @@
   align-items: center!important;
 }
 
+.justify-end {
+  justify-content: flex-end!important;
+}
+
 .flex-1 {
   flex: 1;
 }
@@ -19,12 +23,28 @@
   margin-left: auto!important;
 }
 
+.ml-2px {
+  margin-left: 2px;
+}
+
+.ml-4px {
+  margin-left: 4px;
+}
+
 .ml-8px {
   margin-left: 8px;
 }
 
 .ml-12px {
   margin-left: 12px;
+}
+
+.ml-16px {
+  margin-left: 16px;
+}
+
+.ml-20px {
+  margin-left: 20px;
 }
 
 .text-xs, .text-10 {

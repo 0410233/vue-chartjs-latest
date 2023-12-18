@@ -3,30 +3,25 @@ import { generateFormdata, generateWatchers } from './utils'
 /** 组件属性 */
 export function getProps() {
   return {
-    // 分割类型 = {space:空白,line:分割线}
-    separatorType: {
+    // 背景图片
+    backgroundImage: {
       type: String,
-      default: 'space',
+      default: '',
     },
-    // 高度 = [1,100]
-    separatorHeight: {
-      type: Number,
-      default: 30,
-    },
-    // 分割线类型 = {solid:实线,dashed:虚线,dotted:点线}
-    lineStyle: {
+    // 店铺 logo
+    logo: {
       type: String,
-      default: 'solid',
+      default: '',
     },
-    // 左右留边 = {0:无边距,1:左右留边}
-    marginX: {
-      type: Number,
-      default: 0,
+    // 显示关注
+    isShowFollow: {
+      type: Boolean,
+      default: true,
     },
-    // 辅助线颜色
-    lineColor: {
-      type: String,
-      default: '#e5e5e5',
+    // 显示评分
+    isShowStars: {
+      type: Boolean,
+      default: true,
     },
   }
 }
@@ -46,11 +41,11 @@ export function getWatchers(context) {
 /** 元数据 */
 export function getMeta() {
   return {
-    name: 'separator',
-    label: '辅助分割',
+    name: 'shop',
+    label: '店铺信息',
     cate: 'basic',
     // count: 0,
-    limit: 100,
+    limit: 20,
     data: getFormdata(),
   }
 }

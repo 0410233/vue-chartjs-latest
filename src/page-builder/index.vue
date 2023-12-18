@@ -2,7 +2,7 @@
   <div class="page-builder-wrapper" :class="isFullscreen && 'is-fullscreen'" ref="el_builder">
     <div class="page-builder">
       <div class="page-builder__header">
-        <el-button size="small" type="success" icon="el-icon-view">预览</el-button>
+        <el-button size="small" type="success" icon="el-icon-view" @click="selected = null">预览</el-button>
         <el-button size="small" type="primary" icon="el-icon-document-checked">保存</el-button>
         <el-button size="small" icon="el-icon-document">草稿</el-button>
         <el-button v-if="fullscreenEnabled"
@@ -10,23 +10,45 @@
           @click="toggleFullscreen"
         >{{ isFullscreen ? '退出全屏' : '全屏' }}</el-button>
       </div>
-      <draggable tag="div" class="page-builder__items"
-        v-model="items"
-        v-bind="itemDragOptions"
-      >
-        <div v-for="item in items" :key="item.name" class="component">
-          <component :is="upperFirst(item.name) + 'Item'"></component>
-        </div>
-      </draggable>
+      <div class="page-builder__items-container">
+        <el-tabs class="page-builder__item-tabs" v-model="currentCate" type="card" stretch>
+          <el-tab-pane label="基础组件" name="basic">
+            <draggable tag="div" class="page-builder__items"
+              :value="basicItems"
+              v-bind="itemDragOptions"
+            >
+              <div v-for="item, index in basicItems" :key="item.name"
+                class="component" :class="item.count >= item.limit && 'is-disabled'"
+                @click="onClickListItem(index)"
+              >
+                <component :is="camelCase(item.name) + 'Item'" :count="item.count"></component>
+              </div>
+            </draggable>
+          </el-tab-pane>
+          <el-tab-pane label="营销组件" name="marketing">
+            <draggable tag="div" class="page-builder__items"
+              :value="marketingItems"
+              v-bind="itemDragOptions"
+            >
+              <div v-for="item, index in marketingItems" :key="item.name"
+                class="component" :class="item.count >= item.limit && 'is-disabled'"
+                @click="onClickListItem(index)"
+              >
+                <component :is="camelCase(item.name) + 'Item'" :count="item.count"></component>
+              </div>
+            </draggable>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
       <div class="page-builder__layout">
         <div class="phone">
-          <img src="../assets/iphone-frame.png" alt="" class="phone__frame">
+          <img src="./assets/iphone-frame.png" alt="" class="phone__frame">
           <div class="phone__screen" @click="onClickScreen">
             <div class="layer layer--header" :class="currentTab === 'header' ? 'is-active' : ''">
               <div class="navbar">{{ headerData.title }}</div>
             </div>
             <div class="layer layer--body" :class="currentTab === 'view-options' ? 'is-active' : ''">
-              <el-scrollbar ref="scrollbar">
+              <div class="views-scroll" ref="views_scroll">
                 <draggable tag="div"
                   class="views"
                   :style="{minHeight: windowHeight + 'px'}"
@@ -37,13 +59,24 @@
                 >
                   <div v-for="view, index in views" :key="index"
                     class="view"
-                    :class="{'is-active': selected === index}"
+                    :class="{'is-active': selected === index, 'is-placeholder': view.fixed}"
                     @click.stop="onClickView(index)"
                   >
-                    <component :is="upperFirst(view.name) + 'View'" v-bind="view.data"></component>
+                    <component :is="camelCase(view.name) + 'View'" v-bind="view.data"></component>
                   </div>
                 </draggable>
-              </el-scrollbar>
+              </div>
+            </div>
+            <div class="layer layer--float" :class="currentTab === 'view-options' ? 'is-active' : ''">
+              <template v-for="view, index in views">
+                <component v-if="view.fixed" :key="index"
+                  :is="camelCase(view.name) + 'View'"
+                  v-bind="view.data"
+                  :class="{'is-active': selected === index}"
+                  @click.stop="onClickView(index)"
+                  data-fixed="true"
+                ></component>
+              </template>
             </div>
             <div class="layer layer--footer" :class="currentTab === 'footer' ? 'is-active' : ''">
               <div class="tabbar">{{ '（底部导航）' }}</div>
@@ -51,7 +84,7 @@
             <div :class="{overlay: true, 'is-active': currentTab === 'footer' || currentTab === 'header'}"></div>
           </div>
           <div class="phone__notch">
-            <img src="../assets/iphone-frame.png" alt="" class="phone__frame">
+            <img src="./assets/iphone-frame.png" alt="" class="phone__frame">
           </div>
         </div>
       </div>
@@ -94,7 +127,7 @@
           </el-tab-pane>
           <el-tab-pane label="组件设置" name="view-options">
             <component v-if="selectedView"
-              :is="upperFirst(selectedView.name) + 'Form'"
+              :is="camelCase(selectedView.name) + 'Form'"
               v-bind="selectedView.data"
               @change="onChange"
             ></component>
@@ -125,8 +158,18 @@
 </template>
 
 <script>
-import draggable from "vuedraggable";
-import { components, metas } from './components'
+import _ from 'lodash'
+import draggable from "vuedraggable"
+import { components, getMetaList } from './components'
+import SimpleBar from 'simplebar'
+import ResizeObserver from 'resize-observer-polyfill'
+import 'simplebar/dist/simplebar.css'
+
+try {
+  if (!window.ResizeObserver) {
+    window.ResizeObserver = ResizeObserver
+  }
+} catch {}
 
 export default {
   name: "PageBuilder",
@@ -137,7 +180,9 @@ export default {
   data() {
     return {
       /** 左侧列表项目 */
-      items: metas.map((meta, i) => Object.assign({order: i + 1, fixed: false}, meta)),
+      items: [],
+      /** 组件分类 = {basic:基础组件,marketing:营销组件} */
+      currentCate: 'basic',
       /** 视图，组件拖放到布局区后生成视图 */
       views: [],
       /** 当前选择的视图的序号 */
@@ -149,6 +194,7 @@ export default {
           pull: 'clone',
           put: false,
         },
+        filter: '.is-disabled',
         ghostClass: 'component--ghost',
         sort: false,
         clone: (item) => JSON.parse(JSON.stringify(item)),
@@ -198,13 +244,28 @@ export default {
     }
   },
   computed: {
+    basicItems() {
+      return this.items.filter(x => x.cate === 'basic')
+    },
+    marketingItems() {
+      return this.items.filter(x => x.cate === 'marketing')
+    },
     selectedView() {
       return this.views[this.selected] || null
     },
   },
+  created() {
+    getMetaList().then(metaList => {
+      // console.log('metaList', metaList)
+      this.items = metaList.map((m, i) => {
+        return Object.assign({order: i+1, fixed: false, count: 0}, m)
+      })
+    })
+  },
   mounted() {
     // console.log(this.$refs.scrollbar)
-    const rect = this.$refs.scrollbar.$el.getBoundingClientRect()
+    // const rect = this.$refs.scrollbar.$el.getBoundingClientRect()
+    const rect = this.$refs.views_scroll.getBoundingClientRect()
     this.windowHeight = Math.max(rect.height - 20, 420)
 
     // 全屏设置
@@ -221,9 +282,12 @@ export default {
     } catch (err) {
       console.warn(err)
     }
+
+    // 滚动条
+    new SimpleBar(this.$refs.views_scroll)
   },
   unmounted() {
-    // 
+    //
   },
   methods: {
     /** 切换全屏 */
@@ -240,20 +304,52 @@ export default {
         this.isFullscreen = false
       }
     },
+    /** 统计组件使用 */
+    countItem(item) {
+      item.count = this.views.filter(x => x.name === item.name).length
+      const index = this.items.findIndex(x => x.name === item.name)
+      // console.log('countItem', {item, views: this.views.slice()})
+      this.$set(this.items, index, Object.assign({}, item))
+      // this.items.splice(index, 1, Object.assign({}, item))
+    },
+    /** 点击列表添加组件 */
+    onClickListItem(index) {
+      const item = this.currentCate === 'basic'
+        ? this.basicItems[index]
+        : this.marketingItems[index]
+      if (item.count >= item.limit) {
+        this.$message.warning('该组件已达到上限')
+        return
+      }
+      this.views.push(JSON.parse(JSON.stringify(item)))
+      this.selected = this.views.length - 1
+
+      this.countItem(item)
+    },
     /** 组件拖放到布局区 */
     onAdd(evt) {
       // console.log('onAdd', {evt})
       // const com = this.components[evt.oldIndex]
       // this.views.splice(evt.newIndex, 0, JSON.parse(JSON.stringify(com)))
       this.selected = evt.newIndex
+
+      const item = this.currentCate === 'basic'
+        ? this.basicItems[evt.oldIndex]
+        : this.marketingItems[evt.oldIndex]
+      if (item) {
+        this.countItem(item)
+      }
     },
     /** 视图参数变化 */
     onChange(data) {
-      if (this.selected >= 0 && this.selectedView) {
-        const value = Object.assign({}, this.views[this.selected].data, data)
-        console.log('onChange', {selected: this.selected, value})
-        this.$set(this.views[this.selected], 'data', value)
+      const view = this.views[this.selected]
+      if (view) {
+        Object.assign(view.data, data)
+        this.$set(this.views, this.selected, Object.assign({}, view))
       }
+      // const value = Object.assign({}, this.views[this.selected].data, data)
+      // console.log('onChange', {selected: this.selected, value})
+      // this.$set(this.views[this.selected], 'data', value)
     },
     /** 删除视图 */
     removeBlock() {
@@ -295,31 +391,40 @@ export default {
         behavior: "smooth",
       })
     },
-    /**
-     * 点击模拟器非视图部分，清空当前及保存的视图
-     */
+    /** 点击非视图部分 */
     onClickScreen() {
       // if (this.currentTab === 'body') {
       //   this.selected = null
       // }
     },
     /** 第一个字母转大写 */
-    upperFirst(str) {
+    camelCase(str) {
       if (str.length) {
-        str = str[0].toUpperCase() + str.slice(1)
+        str = str.split('-').map(substr => {
+          if (substr) {
+            return substr[0].toUpperCase() + substr.slice(1)
+          } else {
+            return ''
+          }
+        }).join('')
       }
       return str
     },
-    /** 复制组件 */
+    /** 复制视图 */
     copyView(index) {
       const view = this.views[index]
       if (view) {
         this.views.push(JSON.parse(JSON.stringify(view)))
+
+        const item = this.items.find(x => x.name === view.name)
+        this.countItem(item)
       }
     },
-    /** 删除组件 */
+    /** 删除视图 */
     deleteView(index) {
-      this.views.splice(index, 1)
+      const view = this.views.splice(index, 1)[0]
+      const item = this.items.find(x => x.name === view.name)
+      this.countItem(item)
     },
     /** 点击排序视图 */
     onClickSortableView(index) {
@@ -331,10 +436,10 @@ export default {
 };
 </script>
 
+<style lang="scss" src="./assets/base.scss"></style>
+<style lang="scss" src="./assets/utils.scss" scoped></style>
+<style lang="scss" src="./assets/view-options.scss" scoped></style>
 <style lang="scss" scoped>
-@import './assets/utils.scss';
-@import './assets/view-options.scss';
-
 // 模拟器宽度
 $phone-width: 372px;
 // 模拟器高度
@@ -354,15 +459,32 @@ $phone-safearea-height: 34px;
 // 底部导航高度
 $phone-tabbar-height: 50px;
 
+// 顶部工具栏
+$z-index-header: 1;
+// 模拟器
+$z-index-phone-frame: 0;
+// 模拟器屏幕
+$z-index-phone-screen: 1;
+// 内容
+$z-index-phone-layer: 2;
+// 浮出的内容
+$z-index-phone-layer-active: 4;
+// 内容浮出遮罩
+$z-index-phone-mask: 3;
+// 模拟器顶部相机
+$z-index-phone-notch: 5;
+
 .page-builder-wrapper {
   width: 100%;
   height: 100%;
+  padding: 15px;
   box-sizing: border-box;
-  
+  background: #f5f5f5;
+
   &.is-fullscreen {
-    // height: 100%;
-    padding: 16px;
-    background: #f5f5f5;
+    ::v-deep .el-dialog__wrapper {
+      background: rgba(0, 0, 0, 0.5);
+    }
   }
 }
 
@@ -391,17 +513,57 @@ $phone-tabbar-height: 50px;
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 10;
+    z-index: $z-index-header;
+  }
+
+  &__items-container {
+    flex: none;
+    width: 204px;
+    box-sizing: border-box;
+    background: #ffffff;
+    position: relative;
+
+    ::v-deep .el-tabs {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      width: 100%;
+      height: 100%;
+
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      .el-tabs__header {
+        flex: none;
+        margin: 0;
+      }
+
+      .el-tabs__content {
+        height: auto;
+        min-height: 0;
+        flex: 1;
+        position: relative;
+
+        .el-tab-pane {
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
+      }
+    }
   }
 
   &__items {
     display: flex;
     flex-wrap: wrap;
     align-content: flex-start;
-    flex: none;
-    width: 196px;
+    width: 100%;
+    height: 100%;
     padding: 8px 6px;
-    background: #ffffff;
+    box-sizing: border-box;
 
     overflow: auto;
   }
@@ -411,11 +573,20 @@ $phone-tabbar-height: 50px;
     position: relative;
     margin: 0 40px;
   }
-  
+
   &__options {
     flex: none;
     width: 456px;
     position: relative;
+
+    ::v-deep .el-tabs__content {
+      height: 100%;
+      background: #ffffff;
+
+      .el-tab-pane {
+        height: 100%;
+      }
+    }
   }
 }
 
@@ -424,7 +595,7 @@ $phone-tabbar-height: 50px;
   flex-direction: column;
   align-items: center;
   flex: none;
-  width: 92px;
+  width: 50%;
   padding: 8px 6px;
   box-sizing: border-box;
 
@@ -445,6 +616,11 @@ $phone-tabbar-height: 50px;
     font-size: 14px;
     margin-top: 12px;
   }
+
+  &.is-disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 }
 
 .phone {
@@ -463,18 +639,18 @@ $phone-tabbar-height: 50px;
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 0;
+    z-index: $z-index-phone-frame;
   }
 
   &__notch {
     width: 146px;
     height: 48px;
     overflow: hidden;
-    
+
     position: absolute;
     top: 0;
     left: 114px;
-    z-index: 1001;
+    z-index: $z-index-phone-notch;
   }
 
   &__notch &__frame {
@@ -494,7 +670,7 @@ $phone-tabbar-height: 50px;
     position: absolute;
     top: 19px;
     left: 22px;
-    z-index: 10;
+    z-index: $z-index-phone-screen;
   }
 }
 
@@ -505,34 +681,46 @@ $phone-tabbar-height: 50px;
   left: 0;
 
   &.is-active {
-    z-index: 200;
+    z-index: $z-index-phone-layer-active;
   }
 
   &--header {
-    height: calc($phone-statusbar-height + $phone-navbar-height);
+    height: $phone-statusbar-height + $phone-navbar-height;
     padding-top: $phone-navbar-height;
     background: #ffffff;
 
     top: 0;
-    z-index: 10;
+    z-index: $z-index-phone-layer;
   }
 
   &--body {
     height: 100%;
-    padding-top: calc($phone-statusbar-height + $phone-navbar-height);
-    padding-bottom: calc($phone-safearea-height + $phone-tabbar-height);
+    padding-top: $phone-statusbar-height + $phone-navbar-height;
+    padding-bottom: $phone-safearea-height + $phone-tabbar-height;
 
     top: 0;
-    z-index: 20;
+    z-index: $z-index-phone-layer;
+  }
+
+  &--float {
+    pointer-events: none;
+    // background: rgba(0, 0, 0, 0.1);
+    width: 100%;
+    height: auto;
+    top: $phone-statusbar-height + $phone-navbar-height;
+    bottom: $phone-safearea-height + $phone-tabbar-height;
+    left: 0;
+    right: 0;
+    z-index: $z-index-phone-layer;
   }
 
   &--footer {
-    height: calc($phone-safearea-height + $phone-tabbar-height);
+    height: $phone-safearea-height + $phone-tabbar-height;
     padding-bottom: $phone-safearea-height;
     background: #ffffff;
 
     bottom: 0;
-    z-index: 10;
+    z-index: $z-index-phone-layer;
   }
 
   .navbar {
@@ -580,8 +768,13 @@ $phone-tabbar-height: 50px;
 
   &.is-active {
     opacity: 1;
-    z-index: 100;
+    z-index: $z-index-phone-mask;
   }
+}
+
+.views-scroll {
+  width: 100%;
+  height: 100%;
 }
 
 .views {
@@ -621,6 +814,13 @@ $phone-tabbar-height: 50px;
     min-height: 24px;
     outline: 2px dashed #5151f2;
     // outline-offset: -4px;
+
+    position: relative;
+    z-index: 1;
+  }
+
+  &.is-placeholder {
+    display: none;
   }
 
   &--ghost {
@@ -772,7 +972,7 @@ $phone-tabbar-height: 50px;
     }
   }
 
-  &:hover &__btn {
+  &:hover .view-sort-item__btn {
     opacity: 1;
   }
 }

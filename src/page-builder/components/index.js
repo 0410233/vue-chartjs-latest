@@ -1,7 +1,3 @@
-import { generateFormdata } from './utils'
-import { getProps as getCaptionProps } from './caption'
-import { getProps as getSeparatorProps } from './separator'
-
 export const components = {
   CaptionItem: () => import('./CaptionItem.vue'),
   CaptionForm: () => import('./CaptionForm.vue'),
@@ -9,17 +5,58 @@ export const components = {
   SeparatorItem: () => import('./SeparatorItem.vue'),
   SeparatorForm: () => import('./SeparatorForm.vue'),
   SeparatorView: () => import('./SeparatorView.vue'),
+  NavigationItem: () => import('./NavigationItem.vue'),
+  NavigationForm: () => import('./NavigationForm.vue'),
+  NavigationView: () => import('./NavigationView.vue'),
+  NoticeItem: () => import('./NoticeItem.vue'),
+  NoticeView: () => import('./NoticeView.vue'),
+  NoticeForm: () => import('./NoticeForm.vue'),
+  PictureadItem: () => import('./PictureadItem.vue'),
+  PictureadView: () => import('./PictureadView.vue'),
+  PictureadForm: () => import('./PictureadForm.vue'),
+  VideoItem: () => import('./VideoItem.vue'),
+  VideoView: () => import('./VideoView.vue'),
+  VideoForm: () => import('./VideoForm.vue'),
+  RichtextItem: () => import('./RichtextItem.vue'),
+  RichtextView: () => import('./RichtextView.vue'),
+  RichtextForm: () => import('./RichtextForm.vue'),
+  GoodsListItem: () => import('./GoodsListItem.vue'),
+  GoodsListView: () => import('./GoodsListView.vue'),
+  GoodsListForm: () => import('./GoodsListForm.vue'),
+  GoodsCategoryItem: () => import('./GoodsCategoryItem.vue'),
+  GoodsCategoryView: () => import('./GoodsCategoryView.vue'),
+  GoodsCategoryForm: () => import('./GoodsCategoryForm.vue'),
+  ShopItem: () => import('./ShopItem.vue'),
+  ShopView: () => import('./ShopView.vue'),
+  ShopForm: () => import('./ShopForm.vue'),
+  CouponItem: () => import('./CouponItem.vue'),
+  CouponForm: () => import('./CouponForm.vue'),
+  CouponView: () => import('./CouponView.vue'),
+  CustomerServiceItem: () => import('./CustomerServiceItem.vue'),
+  CustomerServiceForm: () => import('./CustomerServiceForm.vue'),
+  CustomerServiceView: () => import('./CustomerServiceView.vue'),
+  SearchItem: () => import('./SearchItem.vue'),
+  SearchForm: () => import('./SearchForm.vue'),
+  SearchView: () => import('./SearchView.vue'),
 }
 
-export const metas = [
-  {
-    name: 'caption',
-    label: '标题文字',
-    data: generateFormdata(getCaptionProps()),
-  },
-  {
-    name: 'separator',
-    label: '辅助分割',
-    data: generateFormdata(getSeparatorProps()),
-  },
+const metaImports = [
+  import('./caption'),
+  import('./separator'),
+  import('./navigation'),
+  import('./notice'),
+  import('./picturead'),
+  import('./video'),
+  import('./richtext'),
+  import('./goods-list'),
+  import('./goods-category'),
+  import('./shop'),
+  import('./coupon'),
+  import('./customer-service'),
+  import('./search'),
 ]
+
+export async function getMetaList() {
+  const result = await Promise.all(metaImports)
+  return result.map(m => m.getMeta())
+}

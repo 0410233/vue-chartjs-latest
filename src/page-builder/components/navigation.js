@@ -3,30 +3,35 @@ import { generateFormdata, generateWatchers } from './utils'
 /** 组件属性 */
 export function getProps() {
   return {
-    // 分割类型 = {space:空白,line:分割线}
-    separatorType: {
-      type: String,
-      default: 'space',
+    // 导航链接
+    links: {
+      type: Array,
+      default: () => [],
     },
-    // 高度 = [1,100]
-    separatorHeight: {
+    // 样式 = {image:图文导航,text:文字导航}
+    navStyle: {
+      type: String,
+      default: 'image',
+    },
+    // 布局方式 = {wrap:折行,scroll:横向滚动}
+    layout: {
+      type: String,
+      default: 'wrap',
+    },
+    // 每行/每屏显示多少个 = [1,6]
+    groupCount: {
       type: Number,
-      default: 30,
+      default: 4,
     },
-    // 分割线类型 = {solid:实线,dashed:虚线,dotted:点线}
-    lineStyle: {
+    // 背景色
+    backgroundColor: {
       type: String,
-      default: 'solid',
+      default: '#ffffff',
     },
-    // 左右留边 = {0:无边距,1:左右留边}
-    marginX: {
-      type: Number,
-      default: 0,
-    },
-    // 辅助线颜色
-    lineColor: {
+    // 文字颜色
+    fontColor: {
       type: String,
-      default: '#e5e5e5',
+      default: '#333333',
     },
   }
 }
@@ -46,8 +51,8 @@ export function getWatchers(context) {
 /** 元数据 */
 export function getMeta() {
   return {
-    name: 'separator',
-    label: '辅助分割',
+    name: 'navigation',
+    label: '图文导航',
     cate: 'basic',
     // count: 0,
     limit: 100,
