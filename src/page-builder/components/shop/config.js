@@ -1,32 +1,28 @@
-import { generateFormdata, generateWatchers } from './utils'
+import { generateFormdata, generateWatchers } from '../utils'
 
 /** 组件属性 */
 export function getProps() {
   return {
-    links: {
-        type: Array,
-        default: () => [],
-      },
-      videosrc: {
-        type: String,
-        default: '',
-      },
-      autoplay:{
-        type:Boolean,
-        default: false,
-      },
-      isMuted:{
-        type:Boolean,
-        default: false,
-      },
-      showProgressBar:{
-        type:Boolean,
-        default: false,
-      },
-      coverUrl: {
-        type: String,
-        default: '',
-      },
+    // 背景图片
+    backgroundImage: {
+      type: String,
+      default: '',
+    },
+    // 店铺 logo
+    logo: {
+      type: String,
+      default: '',
+    },
+    // 显示关注
+    isShowFollow: {
+      type: Boolean,
+      default: true,
+    },
+    // 显示评分
+    isShowStars: {
+      type: Boolean,
+      default: true,
+    },
   }
 }
 
@@ -45,11 +41,11 @@ export function getWatchers(context) {
 /** 元数据 */
 export function getMeta() {
   return {
-    name: 'video',
-    label: '视频',
+    name: 'shop',
+    label: '店铺信息',
     cate: 'basic',
     // count: 0,
-    limit: 50,
+    limit: 20,
     data: getFormdata(),
   }
 }

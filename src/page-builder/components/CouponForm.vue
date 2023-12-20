@@ -11,31 +11,31 @@
         <div  :class="formdata.swiperType === 0 ? 'active' : ''"
             @click="picchange(0)">
         <el-tooltip class="item" effect="dark" content="一行一个" placement="bottom">
-          <span class="iconfont icon-icon_yihangyige" style="font-size: 24px" 
-         
+          <span class="iconfont icon-icon_yihangyige" style="font-size: 24px"
+
           />
         </el-tooltip>
       </div>
       <div :class="formdata.swiperType === 1 ? 'active' : ''"
             @click="picchange(1)">
         <el-tooltip class="item" effect="dark" content="一行二个" placement="bottom">
-          <span class="iconfont icon-yihangerge" style="font-size: 24px" 
-          
+          <span class="iconfont icon-yihangerge" style="font-size: 24px"
+
           />
         </el-tooltip>
       </div>
       <div :class="formdata.swiperType === 2 ? 'active' : ''"
             @click="picchange(2)">
         <el-tooltip class="item" effect="dark" content="一行三个" placement="bottom">
-          <span class="iconfont icon-yihangsange" style="font-size: 24px" 
-        
+          <span class="iconfont icon-yihangsange" style="font-size: 24px"
+
           />
         </el-tooltip>
       </div>
       <div :class="formdata.swiperType === 3 ? 'active' : ''"
             @click="picchange(3)">
         <el-tooltip class="item" effect="dark" content="横向滑动" placement="bottom">
-          <span class="iconfont icon-hengxianghuadong" style="font-size: 24px" 
+          <span class="iconfont icon-hengxianghuadong" style="font-size: 24px"
           />
         </el-tooltip>
       </div>
@@ -67,7 +67,7 @@
         </div>
 
        </el-form-item>
-       
+
        <!-- <el-form-item   prop="checked"> -->
           <!-- <div class="acea-row">
             <template v-if="ruleForm.checked.length">
@@ -82,24 +82,24 @@
               </div>
             </div>
           </div> -->
-          
+
         <!-- </el-form-item> -->
       <el-form-item label="添加优惠券">
-        <el-radio-group size="mini" 
+        <el-radio-group size="mini"
         v-model="tableFrom.category"
             @change="seachList"
             >
           <el-radio :label="1">商家券</el-radio>
           <el-radio :label="2">商品券</el-radio>
         </el-radio-group>
-        
+
       </el-form-item>
       <div class="view-sort-scroll" ref="view_sort_scroll">
               <draggable tag="div"
                 class="view-sort-list"
                 v-model="formdata.goodsList"
                 v-bind="viewSortDragOptions"
-                
+
               >
                 <div v-for="view, index in formdata.goodsList" :key="index"
                   class="view-sort-item"
@@ -122,7 +122,7 @@
               </draggable>
             </div>
     </el-form>
-    
+
     <div style="margin-bottom: 100px;">
       <el-button class="add-link w-full" type="primary" size="small" icon="el-icon-plus" @click="addcoupon">添加优惠券</el-button>
     </div>
@@ -141,12 +141,12 @@
             </div>
             <div class="deco-radio-button"  :class="formdata.swiperType === 2 ? 'active' : ''"
             @click="picchange(2)">
-              
+
               <el-button style="background-color: rgb(255, 233, 183);"  circle></el-button>
             </div>
             <div class="deco-radio-button"  :class="formdata.swiperType === 3 ? 'active' : ''"
             @click="picchange(3)">
-              
+
               <el-button style="background-color: rgb(255, 255, 255);"  circle></el-button>
             </div>
             <div class="deco-radio-button"  :class="formdata.swiperType === 4 ? 'active' : ''"
@@ -158,18 +158,18 @@
             <div class="deco-radio-button"  :class="formdata.swiperType === 5 ? 'active' : ''"
             @click="picchange(5)">
               <!-- <button type="button" value="5" data-zv="8.6.1"   style="background-color: rgb(224, 244, 228);" class="zent-btn">
-                
+
               </button> -->
               <el-button style="background-color: rgb(224, 244, 228);"  circle></el-button>
             </div>
-              
+
           </div>
         </div>
       </div>
     </div>
     <el-dialog title="商家优惠券"  width="1000px" :before-close="handleClose">
       <el-form :model="guaranteeForm" :rules="rules"  ref="guaranteeForm" label-width="100px" class="demo-ruleForm">
-       
+
         <el-form-item label="优惠列表" >
           <el-table
             border
@@ -287,7 +287,10 @@ import { mapGetters } from 'vuex';
 import { marketingListApi, couponSaveApi } from '@/api/product';
 import CouponSelect from './select/CouponSelect.vue'
 import draggable from "vuedraggable"
+import useErrors from './mixins/useErrors'
+
 export default {
+  mixins: [useErrors],
   components: {
     IconAlignLeft,
     IconAlignCenter,
@@ -298,7 +301,7 @@ export default {
   mounted() {
     if (!this.merProductClassify.length) this.$store.dispatch('product/getMerProductClassify');
     if (checkPermi(['merchant:coupon:page:list'])) this.getList();
-    
+
     // if (this.checked.length) {
     //   let [...arr2] = this.checked;
     //   this.checkBox = arr2;
@@ -335,7 +338,7 @@ export default {
       guaranteeList: [],
       multipleSelection:[],
       checkedPage: [],
-      
+
       checkedIds: [], // 订单当前页选中的数据
       isChecked: false,
       isIndex: 0,
@@ -372,7 +375,7 @@ export default {
     ...mapGetters(['merProductClassify']),
   },
   methods: {
-   
+
     checkPermi,
     seachList() {
       this.tableFrom.page = 1;
@@ -411,11 +414,11 @@ export default {
     pageChange(page) {
       this.tableFrom.page = page;
       this.getList();
-      
+
     },
     handleSizeChange(val) {
       this.tableFrom.limit = val;
-      
+
       this.getList();
     },
     changeType(v) {
@@ -525,9 +528,9 @@ export default {
         }
       });
     },
-    
+
     addcoupon(isCreate, editDate, info) {
-   
+
       this.dialogVisible = true;
     },
     handleSelectionChange(val) {
@@ -560,7 +563,7 @@ export default {
     //   }else if(this.formdata.swiperType === 3){
     //     this.formdata.swiperType === 3
     //   }
-      
+
     //   this.$emit('change', {['swiperType']: value,['backimg']: style})
     //  },
     /** 修改属性值 */
@@ -675,7 +678,7 @@ export default {
         border: 1px solid #155bd4;
         background-color: #155bd4;
         color: #155bd4;
-        
+
         // padding: 6px;
       }
 .swiperType {

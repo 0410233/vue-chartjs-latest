@@ -1,32 +1,21 @@
-import { generateFormdata, generateWatchers } from './utils'
+import { generateFormdata, generateWatchers } from '../utils'
 
 /** 组件属性 */
 export function getProps() {
   return {
-    links: {
-        type: Array,
-        default: () => [],
-      },
-      videosrc: {
-        type: String,
-        default: '',
-      },
-      autoplay:{
-        type:Boolean,
-        default: false,
-      },
-      isMuted:{
-        type:Boolean,
-        default: false,
-      },
-      showProgressBar:{
-        type:Boolean,
-        default: false,
-      },
-      coverUrl: {
-        type: String,
-        default: '',
-      },
+    /** 公告内容 */
+    caption: {
+      type: String,
+      default: '',
+    },
+    captionColor: {
+      type: String,
+      default: '#333333',
+    },
+    backgroundColor: {
+      type: String,
+      default: '#ffffff',
+    },
   }
 }
 
@@ -45,11 +34,11 @@ export function getWatchers(context) {
 /** 元数据 */
 export function getMeta() {
   return {
-    name: 'video',
-    label: '视频',
+    name: 'notice',
+    label: '公告',
     cate: 'basic',
     // count: 0,
-    limit: 50,
+    limit: 10,
     data: getFormdata(),
   }
 }

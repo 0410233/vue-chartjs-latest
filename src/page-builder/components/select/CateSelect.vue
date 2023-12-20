@@ -74,7 +74,7 @@ export default {
         }
         return res
       }, [])
-      console.log({rootCates})
+      // console.log({rootCates})
       return rootCates
     },
     getList() {

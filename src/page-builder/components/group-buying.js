@@ -3,30 +3,11 @@ import { generateFormdata, generateWatchers } from './utils'
 /** 组件属性 */
 export function getProps() {
   return {
-    links: {
-        type: Array,
-        default: () => [],
-      },
-      videosrc: {
-        type: String,
-        default: '',
-      },
-      autoplay:{
-        type:Boolean,
-        default: false,
-      },
-      isMuted:{
-        type:Boolean,
-        default: false,
-      },
-      showProgressBar:{
-        type:Boolean,
-        default: false,
-      },
-      coverUrl: {
-        type: String,
-        default: '',
-      },
+    // 活动列表
+    activeList: {
+      type: Array,
+      default: () => [],
+    },
   }
 }
 
@@ -45,10 +26,10 @@ export function getWatchers(context) {
 /** 元数据 */
 export function getMeta() {
   return {
-    name: 'video',
-    label: '视频',
-    cate: 'basic',
-    // count: 0,
+    name: 'group-buying',
+    label: '团购',
+    cate: 'marketing',
+    count: 0,
     limit: 50,
     data: getFormdata(),
   }

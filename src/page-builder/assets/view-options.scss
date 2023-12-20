@@ -22,6 +22,8 @@
   }
 
   .el-form-item__value {
+    flex: none;
+    min-width: 60px;
     font-size: 14px;
     color: #999999;
   }
@@ -78,5 +80,12 @@
 
   ::v-deep .el-switch__core {
     width: 40px!important;
+  }
+
+  .el-form-item__tips {
+    font-size: 12px;
+    line-height: 1.25;
+    color: #999999;
+    margin: 6px 0 0;
   }
 }

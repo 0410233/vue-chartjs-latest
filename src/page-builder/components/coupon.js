@@ -78,3 +78,8 @@ export function getRules() {
     //
   }
 }
+
+// /** 生成提交数据 */
+// export function generateSubmitData(formdata) {
+//   return clone(formdata)
+// }

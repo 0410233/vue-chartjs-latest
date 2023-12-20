@@ -3,7 +3,7 @@
       <h4 class="options__title">{{ meta.label }}</h4>
       <el-form label-width="80px" :model="formdata" size="small">
         <el-form-item label="布局方式">
-        
+
       </el-form-item>
       <div class="deco-control-group">
         <!-- <div class="deco-control-group__header">
@@ -18,7 +18,7 @@
             <span
             class="iconfont icon-icon_yihangyige"
             style="font-size: 20px"
-            
+
             @click="picchange()"
             />
             </div>
@@ -26,15 +26,15 @@
           </div>
           <div style="margin-left: 20px;">
 
-          
+
             <div class="deco-radio-button"  @click="picchange1()" :class="formdata.swiperType === 1 ? 'active' : ''"
             >
             <span
             class="iconfont icon-haibao"
             style="font-size: 20px"
-           
+
           />
-             
+
             </div>
             <p>轮播海报</p>
           </div>
@@ -47,7 +47,7 @@
       </el-form-item> -->
 
       <!-- 轮播图选择 -->
-     
+
 
       <!-- 下划线 -->
       <div class="bor" />
@@ -191,8 +191,10 @@ import {
   getWatchers,
   getMeta,
 } from './picturead'
+import useErrors from './mixins/useErrors'
 
   export default {
+    mixins: [useErrors],
     props: getProps(),
     data() {
       return {

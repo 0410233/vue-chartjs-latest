@@ -1,51 +1,14 @@
-import { generateFormdata, generateWatchers } from './utils'
+import { generateFormdata, generateWatchers } from '../utils'
 
 /** 组件属性 */
 export function getProps() {
   return {
-    SwiperOption:{
-      type:Object,
-      default: () => {},
-    },
-
     // 导航链接
     links: {
       type: Array,
       default: () => [],
     },
-    imageList: {
-      type: Array,
-      default: () => [],
-    },
     // 样式 = {image:图文导航,text:文字导航}
-    pageMargin: {
-      type: Number,
-      default: 0,
-    },
-    type: {
-      type: Number,
-      default: 0,
-    },
-    pagingType: {
-      type: Number,
-      default: 0,
-    },
-    rowindividual: {
-      type: Number,
-      default: 2,
-    },
-    swiperType: {
-      type: Number,
-      default: 0,
-    },
-    borderRadius: {
-      type: Number,
-      default: 0,
-    },
-    imageMargin: {
-      type: Number,
-      default: 0,
-    },
     navStyle: {
       type: String,
       default: 'image',
@@ -88,8 +51,8 @@ export function getWatchers(context) {
 /** 元数据 */
 export function getMeta() {
   return {
-    name: 'picturead',
-    label: '图片',
+    name: 'navigation',
+    label: '图文导航',
     cate: 'basic',
     // count: 0,
     limit: 100,
@@ -100,7 +63,17 @@ export function getMeta() {
 /** 验证规则 */
 export function getRules(context) {
   return {
-    //
+    links: {
+      type: 'array',
+      required: true,
+      message: '请选择链接',
+      defaultField: {
+        type: 'object',
+        fields: {
+          path: {type: 'string', required: true, message: '请选择链接'},
+        }
+      },
+    }
   }
 }
 

@@ -101,8 +101,10 @@ import {
   getMeta,
 } from './video'
 import SettingMer from '@/utils/settingMer';
+import useErrors from './mixins/useErrors'
 
 export default {
+  mixins: [useErrors],
   components: {},
   props: getProps(),
   data() {
