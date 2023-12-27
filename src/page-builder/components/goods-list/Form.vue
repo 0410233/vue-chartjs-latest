@@ -3,10 +3,11 @@
     <h4 class="options__title">{{ meta.label }}</h4>
     <el-form class="options__form"
       :model="formdata"
+      :rules="rules"
       size="small"
       label-position="top"
     >
-      <el-form-item :error="errorsmap.goodsList" label="选择商品">
+      <el-form-item prop="goodsList" :error="errorsmap.goodsList" label="选择商品">
         <draggable tag="div" class="goods-list"
           v-model="formdata.goodsList"
           @input="handleItemsChange"
@@ -25,14 +26,16 @@
               ></el-button> -->
             </div>
           </div>
-          <div class="col col--add">
+          <div v-if="formdata.goodsList.length < 30" class="col col--add">
             <div class="add-goods" @click="showGoodsSelector"><i class="el-icon-plus"></i></div>
           </div>
         </draggable>
+        <p class="el-form-item__tips">最多添加 30 个商品，拖动商品可排序</p>
       </el-form-item>
     </el-form>
     <el-form class="options__form"
       :model="formdata"
+      :rules="rules"
       size="small"
       label-position="left"
       label-width="80px"
@@ -110,7 +113,12 @@
         </div>
       </el-form-item>
     </el-form>
-    <GoodsSelect :visible.sync="goodsSelectorVisible" @change="onGoodsSelected"></GoodsSelect>
+    <GoodsSelect
+      :visible.sync="goodsSelectorVisible"
+      :selection="formdata.goodsList"
+      multiple
+      @confirm="onGoodsSelected"
+    ></GoodsSelect>
   </div>
 </template>
 
@@ -229,9 +237,11 @@ export default generateFormOptions(config, {
       this.goodsSelectorVisible = true
     },
     /** 接收选择的商品 */
-    onGoodsSelected(goods) {
-      const {id, name, image, content, price} = goods
-      this.formdata.goodsList.push({id, name, image, content, price})
+    onGoodsSelected(selection) {
+      this.formdata.goodsList = selection.slice(0, 30).map(goods => {
+        const {id, name, image, content, price} = goods
+        return {id, name, image, content, price}
+      })
       this.handleItemsChange()
     },
     /** 移除商品 */

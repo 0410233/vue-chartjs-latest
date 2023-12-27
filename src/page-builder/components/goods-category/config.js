@@ -1,10 +1,20 @@
 import { generateFormdata, generateWatchers } from '../utils'
 
+/**
+ * @typedef {object} Category
+ * @property {number} id - 页面路径
+ * @property {string} name - 分类名
+ * @property {boolean} showAll - 是否显示全部
+ * @property {number} showCount - 不显示全部时，指定显示商品数
+ * @property {number[]} children - 子类 id 列表
+ */
+
 /** 组件属性 */
 export function getProps() {
   return {
     /**
      * 商品分类
+     * @type {Category[]}
      */
     cateList: {
       type: Array,

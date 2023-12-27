@@ -53,6 +53,11 @@ export default {
     outline: 2px dashed #5151f2;
     outline-offset: -3px;
   }
+
+  &.is-error {
+    outline: 2px dashed #ff5151;
+    outline-offset: -3px;
+  }
 }
 
 .search-view {

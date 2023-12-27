@@ -5,7 +5,7 @@
   >
     <template v-if="!links.length">
       <div class="nav-item" v-for="i in 4" :key="i"
-        @click="onClickExample(link)"
+        @click="onClickExample"
       >
         <div class="nav-item__img is-empty">
           <div class="img-wrapper">

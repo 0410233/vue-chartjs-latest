@@ -36,10 +36,10 @@ export default {
   align-items: center;
   justify-content: center;
   flex: none;
-  border: 1px solid transparent;
+  border: 1px solid #ffffff;
   border-radius: 50%;
   background: #f56c6c;
-  border-color: #f56c6c;
+  // border-color: #f56c6c;
   color: #ffffff;
   overflow: hidden;
   transition: 100ms;

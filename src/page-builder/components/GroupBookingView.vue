@@ -59,11 +59,7 @@
       <div class="goods" @click="onClickGoods(goods)">
         <div class="goods__img">
           <div class="img-wrapper">
-            <img
-              v-if="goods.groupBargainingCommodityModels[0].image"
-              :src="goods.groupBargainingCommodityModels[0].image"
-              alt=""
-            />
+            <img v-if="goods.image" :src="goods.image" alt="" />
             <div v-else class="img-placeholder"><i class="el-icon-picture"></i></div>
             <!-- <div v-if="isShowParticipantsNumber" class="groupBooking_participants">5人已团</div> -->
             <div v-if="layout == 'list'" class="groupBooking_title">
@@ -90,15 +86,15 @@
         <div class="goods__content">
           <div v-if="isShowName" class="goods__name">
             <div class="tag">{{ goods.groupBargainingPeopleNum }}人团</div>
-            {{ goods.groupBargainingCommodityModels[0].name }}
+            {{ goods.groupBargainingResponseVo.groupBargainingName }}
           </div>
           <div v-if="isShowDesc" class="goods__desc">{{ formatHtml(goods.content) }}</div>
           <div class="goods__bottom">
             <div v-if="isShowGroupBookingPrice" class="goods__price">
-              {{ formatPrice(goods.groupBargainingCommodityModels[0].groupPrice) }}
+              {{ formatPrice(goods.groupPrice) }}
             </div>
             <div v-if="isShowPrice" class="strickout">
-              {{ formatPrice(goods.groupBargainingCommodityModels[0].price) }}
+              {{ formatPrice(goods.price) }}
             </div>
             <svg class="goods__cart" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
               <path
@@ -125,7 +121,7 @@ export default {
   },
   methods: {
     onClickGoods(goods) {
-      this.$message.success('跳转商品详情：' + goods.groupBargainingCommodityModels[0].name);
+      this.$message.success('跳转商品详情：' + goods.name);
     },
     formatHtml(html) {
       if (!html) {

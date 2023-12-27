@@ -45,22 +45,7 @@ export function getProductList(data) {
 
 /** 获取可装修页面列表 */
 export function getDecoratablePages() {
-  return [{
-    name: '店铺首页',
-    path: 'pages/merchant/home/index',
-  }, {
-    name: '店铺详情',
-    path: 'pages/merchant/detail/index',
-  }, {
-    name: '商品分类',
-    path: 'pages/merchant/category/index',
-  }, {
-    name: '其他1',
-    path: 'pages/merchant/other1',
-  }, {
-    name: '其他2',
-    path: 'pages/merchant/other2',
-  }]
+  return _.cloneDeep(pages.filter(x => x.decoratable))
 }
 
 /**

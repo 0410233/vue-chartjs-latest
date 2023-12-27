@@ -106,6 +106,11 @@ export default {
     outline-offset: -1px;
   }
 
+  &.is-error {
+    outline: 2px dashed #ff5151;
+    outline-offset: -1px;
+  }
+
   &__icon {
     flex: none;
     display: block;

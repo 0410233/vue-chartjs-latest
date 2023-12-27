@@ -24,8 +24,17 @@
         </el-form-item>
       </el-form>
     </div> -->
-    <el-table class="records" v-loading="loading" :data="tableData" size="mini">
-      <el-table-column prop="id" label="ID" width="80"></el-table-column>
+    <SelectableTable
+      class="records"
+      :loading="loading"
+      :records="tableData"
+      :selection="selection"
+      :multiple="true"
+      size="mini"
+      @selection-change="select"
+    >
+      <el-table-column prop="activityName" label="活动名称"></el-table-column>
+      <!-- <el-table-column prop="id" label="ID" width="80"></el-table-column> -->
       <el-table-column label="商品图" width="80">
         <template slot-scope="scope">
           <el-image
@@ -41,16 +50,16 @@
           <span class="text-ellipsis" :title="scope.row.name">{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="categoryName" label="商品分类" min-width="120"></el-table-column>
+      <el-table-column label="活动状态">
+        <template slot-scope="scope">
+          {{ scope.row.status | statusFil }}
+        </template>
+      </el-table-column>
+      <!-- <el-table-column prop="categoryName" label="商品分类" min-width="120"></el-table-column> -->
       <el-table-column label="活动 时间" min-width="120">
         <template slot-scope="{ row }"> {{ row.startDate }} - {{ row.endDate }}</template>
       </el-table-column>
-      <el-table-column label="选择" width="120">
-        <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="select(scope.row)">选择</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    </SelectableTable>
     <div class="pagination">
       <el-pagination
         layout="total, prev, pager, next"
@@ -71,8 +80,22 @@
 import { seckillProListApi } from '@/api/marketing';
 import { checkPermi } from '@/utils/permission'; // 权限判断函数
 import { mapGetters } from 'vuex';
+import SelectableTable from './SelectableTable.vue';
 
 export default {
+  components: {
+    SelectableTable,
+  },
+  filters: {
+    statusFil(status) {
+      const statusMap = {
+        0: '未开始',
+        1: '进行中',
+        2: '已结束',
+      };
+      return statusMap[status] || '进行中';
+    },
+  },
   data() {
     return {
       loading: false,
@@ -98,7 +121,11 @@ export default {
   },
   computed: {
     ...mapGetters(['merProductClassify']),
+    selection() {
+      return this.goodsList();
+    },
   },
+  inject: ['goodsList'],
   created() {
     if (!localStorage.getItem('merProductClassify')) {
       this.$store.dispatch('product/getMerProductClassify');
@@ -132,14 +159,31 @@ export default {
     search() {
       this.getList(1);
     },
-    select(row) {
-      // this.$emit('change', {
-      //   name: row.name,
-      //   path: '/pages/goods/goods_details/index?id=' + row.id,
-      //   image: row.image,
-      //   from: '商品',
-      // })
-      this.$emit('change', { ...row });
+    select(val) {
+      /**
+       * todo 数据裁剪
+       */
+      const data = val.map((item) => {
+        return {
+          activityId: item.activityId,
+          activityName: item.activityName,
+          categoryName: item.categoryName,
+          id: item.id,
+          image: item.image,
+          merName: item.merName,
+          name: item.name,
+          price: item.price,
+          seckillPrice: item.seckillPrice,
+          startDate: item.startDate,
+          content: item.content,
+          attrValue: item.attrValue.map((item) => {
+            return {
+              attrValue: item.attrValue,
+            };
+          }),
+        };
+      });
+      this.$emit('change', data);
     },
   },
 };

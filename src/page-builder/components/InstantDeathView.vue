@@ -131,7 +131,7 @@ export default {
       if (isNaN(price)) {
         return 0;
       }
-      return Number(price).toFixed(1);
+      return Number(price).toFixed(2);
     },
     // 距离活动开始倒计时
     handleCountdown(startTime, format) {

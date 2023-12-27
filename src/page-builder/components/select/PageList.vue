@@ -12,7 +12,12 @@
       </el-form-item>
     </el-form>
     <el-table v-loading="loading" :data="tableData" class="records" size="mini">
-      <el-table-column prop="name" label="页面" min-width="120"></el-table-column>
+      <el-table-column prop="name" label="页面名称" min-width="120"></el-table-column>
+      <el-table-column label="是否可装修" width="160">
+        <template slot-scope="scope">
+          <span>{{ scope.row.decoratable ? '可装修' : '不可装修' }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="选择" width="120">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="select(scope.row)">选择</el-button>

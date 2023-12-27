@@ -50,7 +50,11 @@ import Tinymce from '@/components/Tinymce/index'
 import { generateFormOptions } from '../utils'
 import * as config from './config'
 
-export default generateFormOptions(config)
+export default generateFormOptions(config, {
+  components: {
+    Tinymce
+  }
+})
 </script>
 
 <style lang="scss" src="../../assets/utils.scss" scoped></style>

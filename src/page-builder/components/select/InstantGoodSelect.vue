@@ -1,6 +1,10 @@
 <template>
-  <el-dialog title="选择商品" :visible.sync="dialogVisible" width="800px">
+  <el-dialog title="秒杀" :visible.sync="dialogVisible" width="800px">
     <GoodsList @change="onSelectGoods"></GoodsList>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="dialogVisible = false">取 消</el-button>
+      <el-button type="primary" @click="confirm">确 定</el-button>
+    </div>
   </el-dialog>
 </template>
 
@@ -20,6 +24,7 @@ export default {
   data() {
     return {
       dialogVisible: false,
+      goods: [],
     };
   },
   watch: {
@@ -39,7 +44,10 @@ export default {
   },
   methods: {
     onSelectGoods(goods) {
-      this.$emit('change', goods);
+      this.goods = goods;
+    },
+    confirm() {
+      this.$emit('change', this.goods);
       this.dialogVisible = false;
     },
   },

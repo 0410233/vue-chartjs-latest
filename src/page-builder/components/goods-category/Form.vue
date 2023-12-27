@@ -7,7 +7,7 @@
       size="small"
       label-position="top"
     >
-      <el-form-item :error="errorsmap.cateList" label="商品分类：">
+      <el-form-item prop="cateList" :error="errorsmap.cateList" label="商品分类：">
         <draggable tag="div" class="cate-list"
           v-model="formdata.cateList"
           @input="handleCateListChange"

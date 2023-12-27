@@ -24,34 +24,35 @@
         </el-form-item>
       </el-form>
     </div> -->
-    <el-table class="records" v-loading="loading" :data="tableData" size="mini">
-      <el-table-column prop="id" label="ID" width="80"></el-table-column>
+    <SelectableTable
+      class="records"
+      :loading="loading"
+      :records="tableData"
+      :selection="selection"
+      :multiple="true"
+      size="mini"
+      @selection-change="select"
+    >
+      <el-table-column label="活动名称" width="80">
+        <template slot-scope="{ row }">
+          {{ row.groupBargainingResponseVo.groupBargainingName }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="groupBargainingPeopleNum" label="成团人数"></el-table-column>
       <el-table-column label="商品图" width="80">
         <template slot-scope="scope">
           <el-image
             style="width: 40px; height: 40px"
-            :src="scope.row.groupBargainingCommodityModels[0].image"
+            :src="scope.row.image"
             fit="contain"
-            :preview-src-list="[scope.row.groupBargainingCommodityModels[0].image]"
+            :preview-src-list="[scope.row.image]"
           />
         </template>
       </el-table-column>
-      <el-table-column prop="name" label="商品名称" min-width="150">
-        <template slot-scope="scope">
-          <span class="text-ellipsis" :title="scope.row.groupBargainingCommodityModels[0].name">{{
-            scope.row.groupBargainingCommodityModels[0].name
-          }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="groupBargainingPeopleNum" label="成团人数"></el-table-column>
+      <el-table-column prop="name" label="商品名称" min-width="150"> </el-table-column>
       <el-table-column prop="startTime" label="开始使用时间" min-width="120"></el-table-column>
       <el-table-column prop="endTime" label="结束使用时间" min-width="120"></el-table-column>
-      <el-table-column label="选择" width="120">
-        <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="select(scope.row)">选择</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    </SelectableTable>
     <div class="pagination">
       <el-pagination
         layout="total, prev, pager, next"
@@ -72,8 +73,12 @@
 import { getGroupBargainingCommodity } from '@/api/groupBargaining';
 import { checkPermi } from '@/utils/permission'; // 权限判断函数
 import { mapGetters } from 'vuex';
+import SelectableTable from './SelectableTable.vue';
 
 export default {
+  components: {
+    SelectableTable,
+  },
   data() {
     return {
       loading: false,
@@ -99,7 +104,11 @@ export default {
   },
   computed: {
     ...mapGetters(['merProductClassify']),
+    selection() {
+      return this.goodsList();
+    },
   },
+  inject: ['goodsList'],
   created() {
     if (!localStorage.getItem('merProductClassify')) {
       this.$store.dispatch('product/getMerProductClassify');
@@ -112,20 +121,13 @@ export default {
       if (currentPage > 0) {
         this.pagination.page = currentPage;
       }
-      // const data = {page: this.page, limit: 10}
-      // if (this.searchData.cateId > 0) {
-      //   data.cateId = this.searchData.cateId
-      // }
-      // if (this.searchData.keywords) {
-      //   data.keywords = this.searchData.keywords
-      // }
+      // this.searchData
       const { page, limit } = this.pagination;
-      const data = Object.assign({ page, limit }, this.searchData);
+      const data = Object.assign({ page, limit });
       this.loading = true;
       getGroupBargainingCommodity(data)
         .then((res) => {
           this.loading = false;
-          console.log('res.list', res);
           this.tableData = res.list;
           this.pagination.total = res.total;
         })
@@ -140,14 +142,31 @@ export default {
     search() {
       this.getList(1);
     },
-    select(row) {
-      // this.$emit('change', {
-      //   name: row.name,
-      //   path: '/pages/goods/goods_details/index?id=' + row.id,
-      //   image: row.image,
-      //   from: '商品',
-      // })
-      this.$emit('change', { ...row });
+    select(val) {
+      /**
+       * todo 数据裁剪
+       */
+      const data = val.map((item) => {
+        return {
+          id: item.id,
+          groupBargainingId: item.groupBargainingId,
+          image: item.image,
+          name: item.name,
+          intro: item.intro,
+          price: item.price,
+          groupPrice: item.groupPrice,
+          commodityId: item.commodityId,
+          stock: item.stock,
+          cateId: item.cateId,
+          categoryName: item.categoryName,
+          productNum: item.productNum,
+          groupBargainingPeopleNum: item.groupBargainingPeopleNum,
+          startTime: item.startTime,
+          endTime: item.endTime,
+          groupBargainingResponseVo: { groupBargainingName: item.groupBargainingResponseVo.groupBargainingName },
+        };
+      });
+      this.$emit('change', data);
     },
   },
 };

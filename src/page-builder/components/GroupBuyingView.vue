@@ -5,11 +5,11 @@
         <div class="initiator">
           <div class="initiator_img">
             <div class="img-wrapper">
-              <div class="img-placeholder"><i class="el-icon-picture"></i></div>
+              <div class="img-placeholder"><img :src="active.user.avatar" alt="" /></div>
             </div>
           </div>
           <div class="initiator_content">
-            <div class="initiator_name">{{ active.nickName }}</div>
+            <div class="initiator_name">{{ active.grouponLeader.nickName }}</div>
             <div class="initiator_info">
               <svg
                 t="1702864133749"
@@ -30,8 +30,8 @@
                   p-id="6411"
                 ></path>
               </svg>
-              {{ active.days }}
-              <svg
+              {{ getNowDiffDay(active.grouponInfo.grouponStartTime) }}
+              <!-- <svg
                 class="icon"
                 t="1702863935073"
                 viewBox="0 0 1024 1024"
@@ -52,7 +52,7 @@
                   p-id="6203"
                 ></path>
               </svg>
-              {{ active.peopleNum }}
+              {{ active.peopleNum }} -->
             </div>
           </div>
         </div>
@@ -61,7 +61,8 @@
           <div class="active_price">{{ active.lowPrice }}</div>
           <div class="active_img_list_wrap">
             <div class="img-wrapper" v-for="i in active.productImageList" :key="i">
-              <div class="img-placeholder"><i class="el-icon-picture"></i></div>
+              <!-- <div class="img-placeholder"><i class="el-icon-picture"></i></div> -->
+              <img :src="i" alt="" />
             </div>
           </div>
           <div class="active_bottom_wrap">
@@ -81,7 +82,7 @@
                 ></path>
               </svg>
 
-              {{ active.toursNum }}次跟团
+              {{ active.grouponInfo.orderNum }}次跟团
             </div>
             <div class="right">
               <div class="share">
@@ -116,6 +117,7 @@
 
 <script>
 import { getProps } from './group-buying';
+import { getDiff } from '@/utils/index';
 
 export default {
   props: getProps(),
@@ -133,21 +135,30 @@ export default {
       const demoData = [
         {
           id: '0001',
-          nickName: '团长名称/昵称/后台配置',
-          days: '29天前',
+          grouponLeader: {
+            nickName: '团长名称/昵称/后台配置',
+          },
+          user: {
+            avatar: null,
+          },
           peopleNum: '21人',
           grouponInfo: {
             title: '方大满香酥牛肉馅饼520g（ 104 5 片 ） × 4 袋',
+            grouponStartTime: '2023-12-25',
+            orderNum: 0,
           },
           lowPrice: '59.9',
           productImageList: [null, null, null],
-          toursNum: 0,
         },
       ];
       return demoData;
     },
   },
   methods: {
+    // 距离现在差多少天
+    getNowDiffDay(start) {
+      return `${getDiff(start, new Date(), 'day')}天前`;
+    },
     formatHtml(html) {
       if (!html) {
         return '';
@@ -160,7 +171,7 @@ export default {
       if (isNaN(price)) {
         return 0;
       }
-      return Number(price).toFixed(1);
+      return Number(price).toFixed(2);
     },
   },
 };
@@ -326,7 +337,6 @@ export default {
       height: 70px;
 
       .img-wrapper {
-        flex: 1;
         padding-top: 0;
         width: 100px;
         height: 70px;

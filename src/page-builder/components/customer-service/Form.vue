@@ -4,9 +4,10 @@
     <el-collapse v-model="activeForms" class="options__form">
       <el-collapse-item title="整体外观：" name="view">
         <el-form :model="formdata"
+          :rules="rules"
           size="small"
           label-position="left"
-          label-width="72px"
+          label-width="80px"
         >
           <el-form-item prop="viewWidth" label="宽度">
             <div class="flex items-center w-full">
@@ -56,9 +57,10 @@
       </el-collapse-item>
       <el-collapse-item title="描边设置：" name="border">
         <el-form :model="formdata"
+          :rules="rules"
           size="small"
           label-position="left"
-          label-width="72px"
+          label-width="80px"
         >
           <el-form-item label="显示描边">
             <div class="flex items-center w-full">
@@ -94,9 +96,10 @@
       </el-collapse-item>
       <el-collapse-item title="阴影设置：" name="shadow">
         <el-form :model="formdata"
+          :rules="rules"
           size="small"
           label-position="left"
-          label-width="72px"
+          label-width="80px"
         >
           <el-form-item label="显示阴影">
             <div class="flex items-center w-full">
@@ -133,9 +136,10 @@
       </el-collapse-item>
       <el-collapse-item title="图标设置：" name="icon">
         <el-form :model="formdata"
+          :rules="rules"
           size="small"
           label-position="left"
-          label-width="72px"
+          label-width="80px"
         >
           <el-form-item label="显示图标">
             <div class="flex items-center w-full">
@@ -182,9 +186,10 @@
       </el-collapse-item>
       <el-collapse-item title="文案设置：" name="text">
         <el-form :model="formdata"
+          :rules="rules"
           size="small"
           label-position="left"
-          label-width="72px"
+          label-width="80px"
         >
           <el-form-item label="显示文字">
             <div class="flex items-center w-full">
@@ -230,9 +235,10 @@
       </el-collapse-item>
       <el-collapse-item v-if="formdata.isShowIcon && formdata.isShowText" title="图文排列：" name="layout">
         <el-form :model="formdata"
+          :rules="rules"
           size="small"
           label-position="left"
-          label-width="72px"
+          label-width="80px"
         >
           <el-form-item prop="layout" label="排列方式">
             <div class="flex items-center w-full">

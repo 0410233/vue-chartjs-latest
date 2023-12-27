@@ -159,7 +159,7 @@ import GoodsSelect from './select/InstantGoodSelect.vue';
 import CloseBtn from './common/CloseBtn.vue';
 import { getPropDefaultValue } from './utils';
 import { getProps, getFormdata, getWatchers, getMeta } from './instant-death';
-import useErrors from './mixins/useErrors'
+import useErrors from './mixins/useErrors';
 
 export default {
   mixins: [useErrors],
@@ -188,6 +188,11 @@ export default {
       // visibleDisplay:['不显示','显示']
     };
   },
+  provide() {
+    return {
+      goodsList: () => this.formdata.goodsList,
+    };
+  },
   watch: getWatchers(),
   methods: {
     /** 修改属性值 */
@@ -210,7 +215,7 @@ export default {
     },
     /** 接收选择的商品 */
     onGoodsSelected(goods) {
-      this.formdata.goodsList.push(goods);
+      this.formdata.goodsList = goods;
       this.handleItemsChange();
     },
     /** 移除商品 */

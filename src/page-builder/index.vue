@@ -15,7 +15,7 @@
         size="mini"
         :header-cell-style="{ fontWeight: 'bold' }"
       >
-        <el-table-column prop="merId" label="商户ID" width="100"></el-table-column>
+        <el-table-column prop="id" label="ID" width="80"></el-table-column>
         <el-table-column label="装修页面" width="160">
           <template slot-scope="scope">
             <span>{{ decoratablePageMap[scope.row.path] }}</span>

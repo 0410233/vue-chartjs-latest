@@ -10,15 +10,26 @@
       @selection-change="select"
     >
       <el-table-column type="selection" :reserve-selection="true" width="55"> </el-table-column>
-      <el-table-column prop="name" label="活动名称" min-width="200" show-overflow-tooltip>
+      <el-table-column label="活动名称" show-overflow-tooltip>
         <template slot-scope="scope">
-          <span class="text-ellipsis" :title="scope.row.name">{{ scope.row.name }}</span>
+          <span class="text-ellipsis" :title="scope.row.grouponInfo.title">{{ scope.row.grouponInfo.title }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="merchantProductCategoryName" label="物流方式" min-width="120"></el-table-column>
-      <el-table-column prop="merchantProductCategoryName" label="商品数量" min-width="120"></el-table-column>
-      <el-table-column label="团购时间" width="120">
-        <template slot-scope="scope"> </template>
+      <el-table-column label="商品数量" width="120" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.grouponInfo.productNum }}
+        </template>
+      </el-table-column>
+      <el-table-column label="物流方式" width="120" align="center">
+        <template slot-scope="scope">
+          {{ logisticsMAP[scope.row.grouponInfo.logistics] }}
+        </template>
+      </el-table-column>
+      <el-table-column label="团购时间">
+        <template slot-scope="scope">
+          {{ scope.row.grouponInfo.grouponStartTime }} -
+          {{ scope.row.grouponInfo.grouponEndTime }}
+        </template>
       </el-table-column>
     </el-table>
     <div class="pagination">
@@ -38,7 +49,7 @@
 </template>
 
 <script>
-import { productLstApi as getGoodsList } from '@/api/product';
+import { queryGroupList } from '@/api/groupon';
 import { checkPermi } from '@/utils/permission'; // 权限判断函数
 import { mapGetters } from 'vuex';
 
@@ -64,6 +75,11 @@ export default {
         multiple: false,
         emitPath: false,
       },
+      logisticsMAP: {
+        1: '邮寄',
+        2: '自提',
+        3: '到店安装',
+      },
     };
   },
   computed: {
@@ -85,9 +101,11 @@ export default {
         this.pagination.page = currentPage;
       }
       const { page, limit } = this.pagination;
-      const data = Object.assign({ page, limit }, this.searchData);
+      // grouponStatus 团购状态:0-待开始,1-进行中,2-已结束
+      // isMerchant 是否商户(来源商户时只展示自己商户下的订单) 是否商户;
+      const data = Object.assign({ page, limit, isMerchant: true, grouponStatus: 1 }, this.searchData);
       this.loading = true;
-      getGoodsList(data)
+      queryGroupList(data)
         .then((res) => {
           this.loading = false;
           this.tableData = res.list;

@@ -100,3 +100,8 @@ export function getRules(context) {
 // export function generateSubmitData(formdata) {
 //   return clone(formdata)
 // }
+
+/** 更新表单数据 */
+export async function updateFormdata(formdata) {
+  return formdata
+}

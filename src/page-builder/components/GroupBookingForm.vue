@@ -13,7 +13,7 @@
           <div v-for="(goods, index) in formdata.goodsList" :key="goods.id" class="col">
             <div class="goods" :title="goods.name">
               <div class="img-wrapper">
-                <img :src="goods.groupBargainingCommodityModels[0].image" alt="" class="goods__img" />
+                <img :src="goods.image" alt="" class="goods__img" />
               </div>
               <CloseBtn class="goods__remove" size="16" @click="removeGoods(index)"></CloseBtn>
               <!-- <el-button class="goods__remove" type="danger"
@@ -159,7 +159,7 @@ import GoodsSelect from './select/GroupBookingGoodsSelect.vue';
 import CloseBtn from './common/CloseBtn.vue';
 import { getPropDefaultValue } from './utils';
 import { getProps, getFormdata, getWatchers, getMeta } from './group-booking';
-import useErrors from './mixins/useErrors'
+import useErrors from './mixins/useErrors';
 
 export default {
   mixins: [useErrors],
@@ -188,6 +188,11 @@ export default {
       // visibleDisplay:['不显示','显示']
     };
   },
+  provide() {
+    return {
+      goodsList: () => this.formdata.goodsList,
+    };
+  },
   watch: getWatchers(),
   methods: {
     /** 修改属性值 */
@@ -210,7 +215,7 @@ export default {
     },
     /** 接收选择的商品 */
     onGoodsSelected(goods) {
-      this.formdata.goodsList.push(goods);
+      this.formdata.goodsList = goods;
       this.handleItemsChange();
     },
     /** 移除商品 */

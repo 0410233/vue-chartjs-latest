@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import Schema from 'async-validator';
 import useErrors from './mixins/useErrors'
 
 /** 获取默认值 */
@@ -59,9 +60,30 @@ export function clone(obj) {
   }
 }
 
+/**
+ * 验证表单数据
+ * @returns {Promise<Array<{field: string, message: string}>>}
+ */
+export async function validate(formdata, rules) {
+  // console.log('validate', {formdata, rules})
+  if (!_.isObject(formdata) || !_.isObject(rules) || _.isEmpty(rules)) {
+    return []
+  }
+  try {
+    await new Schema(rules).validate(formdata)
+  } catch (err) {
+    // console.log('validate errors', {err})
+    if (err && Array.isArray(err.errors)) {
+      return err.errors
+    }
+  }
+  return []
+}
+
 /** 生成表单组件配置 */
 export function generateFormOptions(config, options) {
   const props = config.getProps()
+  // _.keys()
   const mixin = {
     props,
     data() {
@@ -77,12 +99,33 @@ export function generateFormOptions(config, options) {
       handleChange(value, prop) {
         // console.log('handleChange', {value})
         this.$emit('change', {[prop]: value})
+
+        // 校验该字段
+        this.validate(prop)
       },
       /** 重置属性值 */
       reset(prop) {
         const value = getPropDefaultValue(props, prop)
         this.handleChange(value, prop)
       },
+      /** 执行表单验证 */
+      async validate(field) {
+        // console.log('on form validate', arguments)
+        // const errors = await validate(this.formdata, config.getRules())
+        // this.$emit('validate', errors)
+        // return errors
+
+        const rules = {[field]: this.rules[field]}
+        const formdata = {[field]: this.formdata[field]}
+        const errors = await validate(formdata, rules)
+        if (!errors.length) {
+          errors.push({field, message: undefined})
+        }
+        // console.log('validate field', clone({field, rules, formdata, errors}))
+        this.$emit('validate', errors)
+        return errors
+      },
+      /** 什么都不做 */
       noop() {},
     },
   }

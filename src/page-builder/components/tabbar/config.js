@@ -1,19 +1,30 @@
 import { generateFormdata, generateWatchers } from '../utils'
 
+/**
+ * @typedef {object} Link
+ * @property {string} pagePath - 页面路径
+ * @property {string} iconPath - 未选中图标
+ * @property {string} selectedIconPath - 选中图标
+ * @property {string} text - 导航标题
+ */
+
 /** 组件属性 */
 export function getProps() {
   return {
-    /** 底部导航 */
+    /**
+     * 底部导航
+     * @type {Link[]}
+     */
     links: {
       type: Array,
       default: () => [],
     },
-    /** 选中颜色 */
+    /** 未选中颜色 */
     textColor: {
       type: String,
       default: '#333333',
     },
-    /** 未选中颜色 */
+    /** 选中颜色 */
     selectedTextColor: {
       type: String,
       default: '#333333',
@@ -63,9 +74,10 @@ export function getRules(context) {
         fields: {
           iconPath: {type: 'string', required: true, message: '请选择图标'},
           selectedIconPath: {type: 'string', required: true, message: '请选择图标'},
-          name: {type: 'string', required: true, message: '请输入标题'},
+          text: {type: 'string', required: true, message: '请输入导航标题'},
         }
       },
+      trigger: ['change','blur'],
     }
   }
 }

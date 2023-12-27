@@ -7,8 +7,8 @@ export function getProps() {
       type: Number,
       default: 0,
     },
-     // 商品
-     goodsList: {
+    // 商品
+    goodsList: {
       type: Array,
       default: () => [],
     },
@@ -27,8 +27,8 @@ export function getProps() {
       type: String,
       default: 'linear-gradient(150deg, #d24161 50%, #d24161d8 50%)',
     },
-     // 样式 = {image:图文导航,text:文字导航}
-     navStyle: {
+    // 样式 = {image:图文导航,text:文字导航}
+    navStyle: {
       type: String,
       default: 'image',
     },
@@ -44,7 +44,9 @@ export function getProps() {
       type: String,
       default: ''
     },
-
+    category: {
+      type: Number,
+    },
   }
 }
 

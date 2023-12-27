@@ -2,7 +2,12 @@
   <div class="options">
     <h4 class="options__title">顶部导航</h4>
     <!-- <p class="options__subtitle">（副标题）</p> -->
-    <el-form :model="formdata" :rules="rules" @submit.native.prevent="noop" label-position="top">
+    <el-form
+      :model="formdata"
+      :rules="rules"
+      @submit.native.prevent="noop"
+      label-position="top"
+    >
       <el-form-item label="页面标题：" prop="title" :error="errorsmap.title">
         <el-input
           v-model="formdata.title"

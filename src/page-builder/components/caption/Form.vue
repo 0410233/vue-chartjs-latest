@@ -7,24 +7,23 @@
       size="small"
       label-position="top"
       @submit.native.prevent="noop"
-      ref="caption_form1"
     >
-      <el-form-item :error="errorsmap.caption" prop="caption" label="标题">
+      <el-form-item prop="caption" :error="errorsmap.caption" label="标题">
         <el-input size="small" v-model="formdata.caption" @input="handleChange($event, 'caption')"></el-input>
       </el-form-item>
-      <el-form-item label="描述">
+      <el-form-item prop="description" label="描述">
         <el-input type="textarea" size="small" v-model="formdata.description" @input="handleChange($event, 'description')"></el-input>
       </el-form-item>
     </el-form>
     <el-form class="options__form"
       :model="formdata"
+      :rules="rules"
       size="small"
       label-position="left"
       label-width="80px"
       @submit.native.prevent="noop"
-      ref="caption_form2"
     >
-      <el-form-item label="显示位置">
+      <el-form-item prop="textAlign" :error="errorsmap.textAlign" label="显示位置">
         <div class="flex items-center w-full">
           <span class="el-form-item__value">{{ alignDisplay[formdata.textAlign] || '' }}</span>
           <el-radio-group class="ml-auto" size="small"
@@ -40,7 +39,7 @@
           </el-radio-group>
         </div>
       </el-form-item>
-      <el-form-item label="标题大小">
+      <el-form-item prop="captionFontSize" :error="errorsmap.captionFontSize" label="标题大小">
         <div class="flex items-center w-full">
           <span class="el-form-item__value">{{ fontSizeDisplay[formdata.captionFontSize] || '' }}</span>
           <el-radio-group class="ml-auto" size="small"
@@ -59,7 +58,7 @@
           </el-radio-group>
         </div>
       </el-form-item>
-      <el-form-item label="描述大小">
+      <el-form-item prop="descriptionFontSize" :error="errorsmap.descriptionFontSize" label="描述大小">
         <div class="flex items-center w-full">
           <span class="el-form-item__value">{{ fontSizeDisplay[formdata.descriptionFontSize] || '' }}</span>
           <el-radio-group class="ml-auto" size="small"
@@ -78,7 +77,7 @@
           </el-radio-group>
         </div>
       </el-form-item>
-      <el-form-item label="标题粗细">
+      <el-form-item prop="captionFontWeight" :error="errorsmap.captionFontWeight" label="标题粗细">
         <div class="flex items-center w-full">
           <span class="el-form-item__value">{{ fontWeightDisplay[formdata.captionFontWeight] || '' }}</span>
           <el-radio-group class="ml-auto" size="small"
@@ -94,7 +93,7 @@
           </el-radio-group>
         </div>
       </el-form-item>
-      <el-form-item label="描述粗细">
+      <el-form-item prop="descriptionFontWeight" :error="errorsmap.descriptionFontWeight" label="描述粗细">
         <div class="flex items-center w-full">
           <span class="el-form-item__value">{{ fontWeightDisplay[formdata.descriptionFontWeight] || '' }}</span>
           <el-radio-group class="ml-auto" size="small"
@@ -110,7 +109,7 @@
           </el-radio-group>
         </div>
       </el-form-item>
-      <el-form-item label="标题颜色">
+      <el-form-item prop="captionColor" :error="errorsmap.captionColor" label="标题颜色">
         <div class="flex items-center w-full">
           <span class="el-form-item__value">{{ formdata.captionColor }}</span>
           <el-button type="text" class="ml-auto" @click="reset('captionColor')">重置</el-button>
@@ -119,7 +118,7 @@
           ></el-color-picker>
         </div>
       </el-form-item>
-      <el-form-item label="描述颜色">
+      <el-form-item prop="descriptionColor" :error="errorsmap.descriptionColor" label="描述颜色">
         <div class="flex items-center w-full">
           <span class="el-form-item__value">{{ formdata.descriptionColor }}</span>
           <el-button type="text" class="ml-auto" @click="reset('descriptionColor')">重置</el-button>
@@ -128,7 +127,7 @@
           ></el-color-picker>
         </div>
       </el-form-item>
-      <el-form-item label="背景颜色">
+      <el-form-item prop="backgroundColor" :error="errorsmap.backgroundColor" label="背景颜色">
         <div class="flex items-center w-full">
           <span class="el-form-item__value">{{ formdata.backgroundColor }}</span>
           <el-button type="text" class="ml-auto" @click="reset('backgroundColor')">重置</el-button>
