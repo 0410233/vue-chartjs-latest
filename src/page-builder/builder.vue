@@ -57,7 +57,7 @@
         其中，布局区又分两层：
           1. 下层常规布局区，用于常规组件（没有浮动）从上到下布局
           2. 上层浮动布局区，用于浮动组件布局（如搜索、客服）
-        上层常规布局区又分两部分：
+        下层常规布局区又分两部分：
           1. 顶部是浮动组件留下的占位组件，具体高度由组件自行决定
           2. 占位组件下面才是可拖放的常规组件布局区
 
@@ -806,36 +806,31 @@ export default {
     },
     /** 生成提交数据 */
     generateSubmitData(status) {
-      // 组件
-      const modules = this.views.map((view, index) => {
-        const { name, label, count, limit, fixed } = view;
-        return {
-          name,
-          label,
-          count,
-          limit,
-          fixed,
-          order: index + 1,
-          data: clone(view.data),
-        };
-      });
       // navbar
-      modules.push({
+      const modules = [{
         name: 'navbar',
         label: '顶部导航',
         count: 1,
         limit: 1,
-        fixed: false,
-        order: modules.length + 1,
+        fixed: true,
+        order: 1,
         data: clone(this.navbarFormdata),
+      }]
+      // 组件
+      this.views.forEach((view, index) => {
+        const { name, label, count, limit, fixed } = view;
+        modules.push({
+          name, label, count, limit, fixed,
+          order: index + 2,
+          data: clone(view.data),
+        })
       });
+
       // 页面
       const { id, path, name, description, backgroundColor } = this.pageFormdata;
 
       return {
-        id,
-        path,
-        name,
+        id, path, name,
         pageDescribe: description,
         backGroundColor: backgroundColor,
         status,

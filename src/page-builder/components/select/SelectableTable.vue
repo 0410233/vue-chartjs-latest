@@ -76,7 +76,7 @@ export default {
           this.updateTableSelection()
         })
       },
-      imediate: true,
+      immediate: true,
     },
     selection: {
       handler() {
@@ -84,7 +84,7 @@ export default {
         this.initSelected()
         this.updateTableSelection()
       },
-      imediate: true,
+      immediate: true,
     },
   },
   beforeDestroy() {
