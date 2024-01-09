@@ -17,8 +17,8 @@ const routes = [
     component: () => import(/* webpackChunkName: "about" */ '../views/AmapView.vue')
   },
   {
-    path: '/app-page-designer',
-    name: 'app-page-designer',
+    path: '/page-builder',
+    name: 'page-builder',
     component: () => import(/* webpackChunkName: "about" */ '../views/PageBuilderView.vue')
   },
   {

@@ -72,11 +72,11 @@
 <script>
 import _ from 'lodash'
 // import GoodsList from './GoodsList.vue'
-import {
-  productLstApi as getGoodsList,
-} from '@/api/product';
-// import { checkPermi } from '@/utils/permission'; // 权限判断函数
-import { mapGetters } from 'vuex';
+// import {
+//   productLstApi as getGoodsList,
+// } from '@/api/product';
+// // import { checkPermi } from '@/utils/permission'; // 权限判断函数
+// import { mapGetters } from 'vuex';
 import SelectableTable from './SelectableTable.vue';
 
 export default {
@@ -141,34 +141,34 @@ export default {
       }
     },
   },
-  computed: {
-    ...mapGetters([
-      'merProductClassify',
-    ]),
-  },
+  // computed: {
+  //   ...mapGetters([
+  //     'merProductClassify',
+  //   ]),
+  // },
   created() {
-    if (!localStorage.getItem('merProductClassify')) {
-      this.$store.dispatch('product/getMerProductClassify')
-    }
+    // if (!localStorage.getItem('merProductClassify')) {
+    //   this.$store.dispatch('product/getMerProductClassify')
+    // }
     this.getList()
   },
   methods: {
     // checkPermi,
-    getList(pg) {
-      if (pg > 0) {
-        this.pagination.page = pg
-      }
-      const {page, limit} = this.pagination
-      const data = Object.assign({page, limit}, this.searchData)
-      this.loading = true
-      getGoodsList(data).then(res => {
-        this.loading = false
-        this.tableData = res.list
-        this.pagination.total = res.total
-      }).catch(err => {
-        this.loading = false
-        console.warn(err)
-      })
+    getList() {
+      // if (pg > 0) {
+      //   this.pagination.page = pg
+      // }
+      // const {page, limit} = this.pagination
+      // const data = Object.assign({page, limit}, this.searchData)
+      // this.loading = true
+      // getGoodsList(data).then(res => {
+      //   this.loading = false
+      //   this.tableData = res.list
+      //   this.pagination.total = res.total
+      // }).catch(err => {
+      //   this.loading = false
+      //   console.warn(err)
+      // })
     },
     onPageChange(page) {
       this.getList(page)

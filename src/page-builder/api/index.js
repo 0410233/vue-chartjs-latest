@@ -1,4 +1,4 @@
-import request from '@/utils/request';
+// import request from '@/utils/request';
 import { pages } from './pages'
 import _ from 'lodash'
 
@@ -36,11 +36,16 @@ export function getPathList(data) {
  * @param {string} [data.cateId]
  */
 export function getProductList(data) {
-  return request({
-    url: '/mall/api/admin/merchant/product/merchant/shop/pro/list',
-    method: 'POST',
-    data,
+  console.log(data)
+  return Promise.resolve({
+    list: [],
+    total: 0,
   })
+  // return request({
+  //   url: '/mall/api/admin/merchant/product/merchant/shop/pro/list',
+  //   method: 'POST',
+  //   data,
+  // })
 }
 
 /** 获取可装修页面列表 */
@@ -48,59 +53,79 @@ export function getDecoratablePages() {
   return _.cloneDeep(pages.filter(x => x.decoratable))
 }
 
-/**
- * 获取页面装修数据列表
- * @param {object} params
- * @param {number} [params.page]
- * @param {number} [params.limit]
- */
-export function getPageDataList(params) {
-  return request({
-    url: '/mall/api/admin/merchantDecoration/list',
-    method: 'GET',
-    params,
-  })
-}
+// /**
+//  * 获取页面装修数据列表
+//  * @param {object} params
+//  * @param {number} [params.page]
+//  * @param {number} [params.limit]
+//  */
+// export function getPageDataList(params) {
+//   return Promise.resolve({
+//     list: [],
+//     total: 0,
+//   })
+//   // return request({
+//   //   url: '/mall/api/admin/merchantDecoration/list',
+//   //   method: 'GET',
+//   //   params,
+//   // })
+// }
 
-/** 保存装修数据 */
-export function postSavePage(data) {
-  return request({
-    url: '/mall/api/admin/merchantDecoration/save',
-    method: 'POST',
-    data,
-  })
-}
+// /** 保存装修数据 */
+// export function postSavePage(data) {
+//   return Promise.resolve({
+//     list: [],
+//     total: 0,
+//   })
+//   // return request({
+//   //   url: '/mall/api/admin/merchantDecoration/save',
+//   //   method: 'POST',
+//   //   data,
+//   // })
+// }
 
-/**
- * 删除装修数据
- * @param {number} id - 装修数据id
- */
-export function postDeletePage(id) {
-  return request({
-    url: `/mall/api/admin/merchantDecoration/delete/${id}`,
-    method: 'POST',
-  })
-}
+// /**
+//  * 删除装修数据
+//  * @param {number} id - 装修数据id
+//  */
+// export function postDeletePage(id) {
+//   return Promise.resolve({
+//     list: [],
+//     total: 0,
+//   })
+//   // return request({
+//   //   url: `/mall/api/admin/merchantDecoration/delete/${id}`,
+//   //   method: 'POST',
+//   // })
+// }
 
-/**
- * 查询装修数据
- * @param {number} id
- * @returns
- */
-export function getPageData(id) {
-  return request({
-    url: `/mall/api/admin/merchantDecoration/getDetail/${id}`,
-    method: 'GET',
-  })
-}
+// /**
+//  * 查询装修数据
+//  * @param {number} id
+//  * @returns
+//  */
+// export function getPageData(id) {
+//   return Promise.resolve({
+//     list: [],
+//     total: 0,
+//   })
+//   // return request({
+//   //   url: `/mall/api/admin/merchantDecoration/getDetail/${id}`,
+//   //   method: 'GET',
+//   // })
+// }
 
-/**
- * 获取底部导航栏数据
- * @returns
- */
-export function getTabbarData() {
-  return request({
-    url: `/mall/api/admin/merchantDecorationNavigation/getOneByMerId`,
-    method: 'GET',
-  })
-}
+// /**
+//  * 获取底部导航栏数据
+//  * @returns
+//  */
+// export function getTabbarData() {
+//   return Promise.resolve({
+//     list: [],
+//     total: 0,
+//   })
+//   // return request({
+//   //   url: `/mall/api/admin/merchantDecorationNavigation/getOneByMerId`,
+//   //   method: 'GET',
+//   // })
+// }

@@ -49,7 +49,7 @@ export function getFormdata() {
 }
 
 /** 监听器 */
-export function getWatchers(context) {
+export function getWatchers() {
   const watchers = generateWatchers(getProps())
   watchers.fixed = {
     handler(newValue) {
@@ -76,7 +76,7 @@ export function getMeta() {
 }
 
 /** 验证规则 */
-export function getRules(context) {
+export function getRules() {
   return {
     //
   }

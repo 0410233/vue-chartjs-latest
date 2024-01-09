@@ -1,5 +1,5 @@
 <template>
-  <div class="goods-list" v-if="checkPermi(['merchant:product:page:list'])">
+  <div class="goods-list">
     <div>
       <el-form inline size="small">
         <el-form-item label="商品分类：">
@@ -61,15 +61,9 @@
       ></el-pagination>
     </div>
   </div>
-  <span v-else>（没有权限）</span>
 </template>
 
 <script>
-import {
-  productLstApi as getGoodsList,
-} from '@/api/product';
-import { checkPermi } from '@/utils/permission'; // 权限判断函数
-import { mapGetters } from 'vuex';
 
 export default {
   data() {
@@ -95,41 +89,32 @@ export default {
       },
     }
   },
-  computed: {
-    ...mapGetters([
-      'merProductClassify',
-    ]),
-  },
   created() {
-    if (!localStorage.getItem('merProductClassify')) {
-      this.$store.dispatch('product/getMerProductClassify')
-    }
     this.getList()
   },
   methods: {
-    checkPermi,
-    getList(currentPage) {
-      if (currentPage > 0) {
-        this.pagination.page = currentPage
-      }
-      // const data = {page: this.page, limit: 10}
-      // if (this.searchData.cateId > 0) {
-      //   data.cateId = this.searchData.cateId
+    getList() {
+      // if (currentPage > 0) {
+      //   this.pagination.page = currentPage
       // }
-      // if (this.searchData.keywords) {
-      //   data.keywords = this.searchData.keywords
-      // }
-      const {page, limit} = this.pagination
-      const data = Object.assign({page, limit}, this.searchData)
-      this.loading = true
-      getGoodsList(data).then(res => {
-        this.loading = false
-        this.tableData = res.list
-        this.pagination.total = res.total
-      }).catch(err => {
-        this.loading = false
-        console.warn(err)
-      })
+      // // const data = {page: this.page, limit: 10}
+      // // if (this.searchData.cateId > 0) {
+      // //   data.cateId = this.searchData.cateId
+      // // }
+      // // if (this.searchData.keywords) {
+      // //   data.keywords = this.searchData.keywords
+      // // }
+      // const {page, limit} = this.pagination
+      // const data = Object.assign({page, limit}, this.searchData)
+      // this.loading = true
+      // getGoodsList(data).then(res => {
+      //   this.loading = false
+      //   this.tableData = res.list
+      //   this.pagination.total = res.total
+      // }).catch(err => {
+      //   this.loading = false
+      //   console.warn(err)
+      // })
     },
     onPageChange(page) {
       this.getList(page)

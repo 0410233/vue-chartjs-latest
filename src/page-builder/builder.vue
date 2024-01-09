@@ -283,14 +283,25 @@
 </template>
 
 <script>
-import _ from 'lodash';
+// import _ from 'lodash';
 import draggable from 'vuedraggable';
-import { getDecoratablePages, postSavePage, getPageData, getTabbarData } from './api';
+import {
+  getDecoratablePages,
+  // postSavePage,
+  // getPageData,
+  // getTabbarData
+} from './api';
 import { clone, validate } from './components/utils';
-import { getFormdata as getTabbarFormdata, getRules as getTabbarRules } from './components/tabbar/config';
+import {
+  getFormdata as getTabbarFormdata,
+  getRules as getTabbarRules
+} from './components/tabbar/config';
 import TabbarForm from './components/tabbar/Form.vue';
 import TabbarView from './components/tabbar/View.vue';
-import { getFormdata as getNavbarFormdata, getRules as getNavbarRules } from './components/navbar/config';
+import {
+  getFormdata as getNavbarFormdata,
+  getRules as getNavbarRules
+} from './components/navbar/config';
 import NavbarForm from './components/navbar/Form.vue';
 import { components, getItemExportList } from './components';
 import SimpleBar from 'simplebar';
@@ -302,7 +313,9 @@ try {
   if (!window.ResizeObserver) {
     window.ResizeObserver = ResizeObserver;
   }
-} catch {}
+} catch(err) {
+  console.warn(err)
+}
 
 export default {
   name: 'PageBuilder',
@@ -441,14 +454,14 @@ export default {
     });
   },
   mounted() {
-    this.initTabbar();
-    // console.log('userProfileInfo', this.$store.getters.userProfileInfo)
-    if (this.$route.query.id) {
-      // 获取数据
-      this.initWithPageDataId(this.$route.query.id);
-    } else {
-      // this.pathPromptVisible = true
-    }
+    // this.initTabbar();
+    // // console.log('userProfileInfo', this.$store.getters.userProfileInfo)
+    // if (this.$route.query.id) {
+    //   // 获取数据
+    //   this.initWithPageDataId(this.$route.query.id);
+    // } else {
+    //   // this.pathPromptVisible = true
+    // }
     // try {
     //   // console.log(this.$refs.scrollbar)
     //   // const rect = this.$refs.scrollbar.$el.getBoundingClientRect()
@@ -491,32 +504,33 @@ export default {
     //     }
     //   })
     // },
-    /** 初始化 tabbar */
-    initTabbar() {
-      getTabbarData()
-        .then((res) => {
-          console.log('getTabbarData', res);
-          if (res.element) {
-            const tabbar = JSON.parse(res.element);
-            Object.assign(this.tabbarFormdata, tabbar);
-          }
-        })
-        .catch((err) => {
-          console.warn(err);
-        });
-    },
+    // /** 初始化 tabbar */
+    // initTabbar() {
+    //   getTabbarData()
+    //     .then((res) => {
+    //       console.log('getTabbarData', res);
+    //       if (res.element) {
+    //         const tabbar = JSON.parse(res.element);
+    //         Object.assign(this.tabbarFormdata, tabbar);
+    //       }
+    //     })
+    //     .catch((err) => {
+    //       console.warn(err);
+    //     });
+    // },
     /** 根据 id 获取装修数据，并初始化 */
     initWithPageDataId(id) {
-      getPageData(id)
-        .then((res) => {
-          console.log('getPageData', res);
-          this.initBuilder(res);
-        })
-        .catch((err) => {
-          console.warn(err);
-          this.$message.error('获取装修数据失败');
-          // this.pathPromptVisible = true
-        });
+      console.log(id)
+      // getPageData(id)
+      //   .then((res) => {
+      //     console.log('getPageData', res);
+      //     this.initBuilder(res);
+      //   })
+      //   .catch((err) => {
+      //     console.warn(err);
+      //     this.$message.error('获取装修数据失败');
+      //     // this.pathPromptVisible = true
+      //   });
     },
     // initWithPagePath(path) {
     //   const merId = this.$store.getters.userProfileInfo.merId
@@ -856,7 +870,8 @@ export default {
       try {
         const status = publish ? 2 : 0;
         const data = this.generateSubmitData(status);
-        await postSavePage(data);
+        // await postSavePage(data);
+        console.log('要保存的数据', data)
         // console.log(res)
         loading.close();
         this.$message.success(publish ? '发布成功' : '保存草稿成功');

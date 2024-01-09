@@ -1,7 +1,6 @@
 <template>
   <el-dialog title="选择商品分类" :visible.sync="dialogVisible" width="800px">
     <el-table class="records"
-      v-if="checkPermi(['merchant:product:category:list'])"
       v-loading="loading"
       :data="tableData"
       size="mini"
@@ -14,15 +13,10 @@
         </template>
       </el-table-column>
     </el-table>
-    <span v-else>（没有权限）</span>
   </el-dialog>
 </template>
 
 <script>
-import {
-  productCategoryListApi as getCateList
-} from '@/api/product.js'
-import { checkPermi } from '@/utils/permission'
 import _ from 'lodash'
 
 export default {
@@ -58,7 +52,6 @@ export default {
     this.getList()
   },
   methods: {
-    checkPermi,
     foldCates(cates) {
       const map = cates.reduce((res, cate) => {
         cate.children = []
@@ -78,13 +71,13 @@ export default {
       return rootCates
     },
     getList() {
-      this.loading = true
-      getCateList().then(cates => {
-        this.tableData = this.foldCates(cates)
-        this.loading = false;
-      }).catch(() => {
-        this.loading = false
-      })
+      // this.loading = true
+      // getCateList().then(cates => {
+      //   this.tableData = this.foldCates(cates)
+      //   this.loading = false;
+      // }).catch(() => {
+      //   this.loading = false
+      // })
     },
     select(cate) {
       this.$emit('change', _.cloneDeep(cate))
